@@ -278,6 +278,49 @@ Any **declaration** that includes an explicit initializer is a **definition**任
 
 It is an **error** to provide an initializer on an `extern` inside a function.
 
+变量能且只能被**定义**一次，但是可以被多次**声明**
+
+The distinction between a **declaration** and a **definition** may seem obscure晦涩的 at this point but is actually important. To use a variable in more than one file requires **declarations** that are separate from the variable’s **definition**. 
+
+To use the same variable in multiple files, we must **define** that variable in **one—and only one—file**. 
+
+Other files that use that variable must **declare**—but **not define**—that variable.
+
+#### 静态类型 ####
+
+C++ is a **statically typed静态类型** language, which means that **types are checked at compile time**. The process by which types are checked is referred to as **type checking**.
+
+As we’ve seen, the type of an object constrains the operations that the object can perform. **In C++, the compiler checks whether the operations we write are supported by the types we use.** If we try to do things that the type does not support, the compiler generates an error message and does not produce an executable file.
+
+As our programs get more complicated, **we’ll see that static type checking can help find bugs.** However, a consequence of static checking is that the type of every entity we use must be known to the compiler. As one example, we must declare the type of a variable before we can use that variable.必须声明类型才能使用变量
+
+### 标识符 ###
+
+**Identifiers** in C++ can be composed of letters, digits, and the underscore character.
+
+The language imposes no limit on name length. Identifiers must begin with either a letter or an underscore. 
+
+Identifiers are case-sensitive; upper- and lowercase letters are distinct:大小写敏感
+
+关键字不能作标识符
+
+![](image/04.png)
+
+#### 变量命名规范 ####
+
+- An identifier should give some indication of its meaning.
+- Variable names normally are lowercase—`index`, not `Index` or `INDEX`.
+- Like `Sales_item`, classes we define usually begin with an uppercase letter.
+- Identifiers with multiple words should visually distinguish each word, for example, `student_loan` or `studentLoan`, not `studentloan`.
+
+### 名字的作用域 ###
+
+## 复合类型 ##
+
+
+
+
+
 
 
 

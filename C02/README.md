@@ -185,3 +185,112 @@ nullptr是指针字面值。
 
 
 ## 变量 ##
+
+A **variable** provides us with named storage that our programs can manipulate.
+
+Each variable in C++ has a **type**. The type determines the size and layout of the variable’s memory, the range of values that can be stored within that memory, and the set of operations that can be applied to the variable. 
+
+C++ programmers tend to refer to variables as “**variables**” or “**objects**” interchangeably.
+
+### 变量定义 ###
+
+A simple variable definition consists of a **type specifier类型说明符**, followed by a list of one or more variable names separated by commas, and ends with a semicolon.
+
+	int sum = 0, value, // sum, value, and units_sold have type int
+	units_sold = 0; // sum and units_sold have initial value 0
+	Sales_item item; // item has type Sales_item (see § 1.5.1 (p. 20))
+	// string is a library type, representing a variable-length sequence of characters
+	std::string book("0-201-78345-X"); // book initialized from string literal
+
+#### 何为对象 ####
+
+**C++ programmers tend to be cavalier in their use of the term object. Most generally, an object is a region of memory that can contain data and has a type.**
+
+Some use the term **object** only to refer to **variables** or **values** of class types. 
+
+Others distinguish between **named** and **unnamed** objects, using the term variable to refer to named objects. 
+
+Still others distinguish between **objects** and **values**, using the term object for data that can be changed by the program and the term **value** for data that are read-only.
+
+**最后，我们认为对象是具有某种类型的内存空间**。
+
+#### 初始值 ####
+
+An object that is **initialized** gets the specified value at the moment it is created.
+
+	// ok: price is defined and initialized before it is used to initialize discount
+	double price = 109.99, discount = price * 0.16;
+	// ok: call applyDiscount and use the return value to initialize salePrice
+	double salePrice = applyDiscount(price, discount);
+
+在C++中，**初始化**不是**赋值**，**初始化**的含义是创建变量时赋予其一个初始值，而**赋值**的含义是把对象的当前值擦除，而一个新值来替代
+
+#### 列表初始化 ####
+
+List Initialization用花括号初始化
+
+	int units_sold = 0;
+	int units_sold = {0};
+	int units_sold{0};
+	int units_sold(0);
+
+	long double ld = 3.1415926536;
+	int a{ld}, b = {ld}; // error: narrowing conversion required
+	int c(ld), d = ld; // ok: but value will be truncated
+
+#### 默认初始化 ####
+
+When we define a variable without an initializer, the variable is **default initialized**.
+
+Such variables are given the “**default**” value. What that default value is depends on the type of the variable and may also depend on where the variable is defined.
+
+The value of an object of built-in type that is not explicitly initialized depends on where it is defined. Variables defined **outside any function body** are initialized to **zero**.(1)
+
+绝大多数类都支持无须显式初始化而定义对象，这样类提供了合适的默认值。
+
+	std::string empty; // empty implicitly initialized to the empty string
+	Sales_item item; // default-initialized Sales_item object
+
+定义于**函数体内**的内置类型的对象如果没有初始化，则其值未定义。(与(1)处的意思相反)类的对象如果没有显示地初始化，则其值由类确定。
+
+**建议初始化每一个内置类型的变量**。虽然并非必须这么做，但如果我们不能确保初始化程序安全，那么这么做不失为一种简单可靠的方法。
+
+### 变量声明和定义的关系 ###
+
+To allow programs to be written in logical parts, C++ supports what is commonly known as **separate compilation分离式编译**. Separate compilation lets us split our programs into several files, each of which can be compiled independently.
+
+When we separate a program into multiple files, we need a way to **share code across those files**（共享跨文件代码）. For example, code defined in one file may need to use a variable defined in another file. As a concrete example, consider `std::cout` and `std::cin`. These are objects defined somewhere in the standard library, yet our programs can use these objects.
+
+To support separate compilation, **C++ distinguishes between declarations声明 and definitions定义.** A **declaration** makes a name known to the program. A file that wants to use a name defined elsewhere includes a declaration for that name. A **definition** creates the associated entity.
+
+A variable **declaration** specifies the type and name of a variable. A variable **definition** is a declaration定义是声明. In addition to specifying the name and type, a **definition** also allocates storage and may provide the variable with an initial value.
+
+定义属于声明，定义比声明多一些东西。
+
+To obtain a **declaration** that is **not** also a **definition**, we add the `extern` keyword and may not provide an explicit initializer:
+
+	extern int i; // declares but does not define i
+	int j; // declares and defines j
+
+Any **declaration** that includes an explicit initializer is a **definition**任何包含了**显式初始化**的**声明**即成为**定义**. We can provide an initializer on a variable defined as extern, but doing so overrides the `extern`. An `extern` that has an initializer is a definition:
+
+	extern double pi = 3.1416; // definition//在函数类会发生异常
+
+It is an **error** to provide an initializer on an `extern` inside a function.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

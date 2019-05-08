@@ -315,17 +315,74 @@ Identifiers are case-sensitive; upper- and lowercase letters are distinct:大小
 
 ### 名字的作用域 ###
 
+无论是在程序的什么位置，使用到的每个名字都会指向一个特定的实体：变量、函数、类型等。**然而，同一个名字如果出现在程序的不同位置，也可能指向的是不同的实体**。
+
+	#include <iostream>
+	int main()
+	{
+		int sum = 0;
+		// sum values from 1 through 10 inclusive
+		for (int val = 1; val <= 10; ++val)
+			sum += val; // equivalent to sum = sum + val
+		std::cout << "Sum of 1 to 10 inclusive is "
+				<< sum << std::endl;
+		return 0;
+	}
+
+名字main定义所有花括号之外，它和其他大多数定义在函数体之外的名字一样拥有**全局作用域global scope**。一旦声明之后，全局作用域内的名字在整个程序的范围内都可使用。
+
+名字sum定义main函数所限定的作用域之内，从声明sum开始直到main函数结束为止都可以访问它，但是出了main函数所在的块就无法访问了，因此说变量sum拥有**块作用域block scope**。
+
+**建议：当你第一次使用变量时再定义它**
+
+#### 嵌套作用域 ####
+
+作用域能彼此包含，被包含（嵌套）的作用域为**内层作用域inner scope**，包含着别的作用域的作用域为**外层作用域outer scope**。
+
+作用域中一旦声明了某个名字，它所嵌套着的所有作用域中都能访问该名字。同时，允许在内层作用域中重新定义外层作用域已有的名字：
+
+	#include <iostream>
+	// Program for illustration purposes only: It is bad style for a function
+	// to use a global variable and also define a local variable with the same name
+	int reused = 42; // reused has global scope
+	int main()
+	{
+		int unique = 0; // unique has block scope
+		// output #1: uses global reused; prints 42 0
+		std::cout << reused << " " << unique << std::endl;
+
+		int reused = 0; // new, local object named reused hides global reused 局部的覆盖全局的
+		// output #2: uses local reused; prints 0 0
+		std::cout << reused << " " << unique << std::endl;
+
+		// output #3: explicitly requests the global reused; prints 42 0 突破局部覆盖访问全局
+		std::cout << ::reused << " " << unique << std::endl;
+		return 0;
+	}
+
+**如果函数有可能用到某全局变量，则不宜再定义一个同名的局部变量。**
+
 ## 复合类型 ##
 
+compound type是指基于其他类型定义的类型。
 
+C++语言有几个复合类型，如 引用reference 和 指针pointer。
 
+一条声明语句由一个**基本数据类型base type**和紧随其后的一个**声明符declarator**列表组成的。每个**声明符**命名了一个变量并指定该变量为与基本数据类型有关的某种类型。
 
+### 引用 ###
 
+引用reference为对象起了另外一个名字，引用类型**引用refers to** 另外一种类型。通过将声明符写成&d的形式来**定义引用类型**，其中d是声明的变量名：
 
+	int ival = 1024;
+	int &refVal = ival; // refVal refers to (is another name for) ival
+	int &refVal2; // error: a reference must be initialized
 
+一般在初始化变量是，初始值会被拷贝到新建的对象。然而定义引用时，程序把引用和它的初始值**绑定bind**在一起，而**不是将初始值拷贝给引用**。
 
+一旦初始化完成，引用将和它的初始化对象一直绑定在一起。因为无法令引用重新绑定到另外一个对象，因此**引用必须初始化**。
 
-
+#### 引用即系别名 ####
 
 
 

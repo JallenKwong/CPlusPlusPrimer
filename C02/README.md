@@ -274,7 +274,7 @@ To obtain a **declaration** that is **not** also a **definition**, we add the `e
 
 Any **declaration** that includes an explicit initializer is a **definition**任何包含了**显式初始化**的**声明**即成为**定义**. We can provide an initializer on a variable defined as extern, but doing so overrides the `extern`. An `extern` that has an initializer is a definition:
 
-	extern double pi = 3.1416; // definition//在函数类会发生异常
+	extern double pi = 3.1416; // definition//在函数内会发生异常
 
 It is an **error** to provide an initializer on an `extern` inside a function.
 
@@ -384,7 +384,7 @@ C++语言有几个复合类型，如 引用reference 和 指针pointer。
 
 #### 引用即别名 ####
 
-引用并非对象，相反的，他只是为一个已经存在的对象所起的另外一个名字
+**引用并非对象**，相反的，他只是为一个已经存在的对象所起的另外一个名字
 
 定义一个引用后，对其进行的所有操作都是在与之绑定的对象上进行的。
 
@@ -533,18 +533,108 @@ null pointer不指向任何对象，在试图使用一个指针之前代码可�
 
 #### 其他指针操作 ####
 
+只要指针拥有一个合法值，就能将它用在条件表达式。和采用算术值作为条件遵循的规则类似，如果指针的值是0，条件取false；任何非0指针对应的条件值都是true，任何非0指针对应的条件值都是true。
+
+	int ival = 1024;
+	int *pi = 0; // pi is a valid, null pointer
+	int *pi2 = &ival; // pi2 is a valid pointer that holds the address of ival
+
+	if (pi) // pi has value 0, so condition evaluates as false
+		// ...
+	if (pi2) // pi2 points to ival, so it is not 0; the condition evaluates as true
+		// ...
+
+对于两个类型相同的合法指针，可以用相等操作符（==）或不相等操作符（!=）来比较它们的地址值。相等，则true。不相等，则false。
 
 
+#### void*指针 ####
+
+`void*`是一种特殊的指针类型，可用于存放任意对象的地址。一个void*指针存放着一个地址，与其他指针类似。
+
+不同的是，我们对该地址中到底是个什么类型的对象并不了解。
+
+	double obj = 3.14, *pd = &obj;
+	// ok: void* can hold the address value of any data pointer type
+	void *pv = &obj; // obj can be an object of any type
+	pv = pd; // pv can hold a pointer to any type
+
+利用`void*`指针能做的事比较有限：
+
+1. 拿它和别的指针比较
+2. 作为函数的输入或输出
+3. 赋给另外一个`void*`指针
+
+不能直接操作void*指针所指的对象，因为我们并不知道这个对象到底是什么类型，也无法确定能在这个对象上做哪些操作。
+
+### 理解复合类型的声明 ###
+
+变量的定义包括一个**基本数据类型base type**和一组声明符。在同一条定义语句中，虽然基本类型只有一个，但是声明符的形式却可以不同。即，一条定义语句可能定义出不同类型的变量：
+
+	// i is an int; p is a pointer to int; r is a reference to int
+	int i = 1024, *p = &i, &r = i;
+
+#### 定义多个变量 ####
+
+经常有一种观点会误以为，在定义语句中，类型修饰符（*或&）作用域本次定义的全部变量。
+
+我们把空格写在类型修饰符和变量名中间：
+
+	int* p;//合法但是容易产生误导
+
+其实，基本类型是int而非int*。*仅仅修饰p而已，对该声明语句中的其他变量，它并不产生任何作用：
+
+	int* p1, p2; // p1 is a pointer to int; p2 is an int
+
+涉及指针或引用的声明，一般有两种写法。
+
+1.把修饰符和变量标识符写在一起
+
+	int *p1, *p2; // both p1 and p2 are pointers to int
+
+2.把修饰符和类型名写在一起，并且每条语句只定义一个变量
+
+	int* p1; // p1 is a pointer to int
+	int* p2; // p2 is a pointer to int
+
+**建议：将*（或是&）与变量名连在一起**
+
+#### 指向指针的指针 ####
+
+指针是内存中的对象，像其他对象一样也有自己的地址，因此允许把指针的地址再存放到另一个指针当中。
+
+通过*的个数区分指针的级别。
+
+`**`表示指向指针的指针。
+
+`***`表示指向指针的指针的指针。
+
+	int ival = 1024;
+	int *pi = &ival; // pi points to an int
+	int **ppi = &pi; // ppi points to a pointer to an int
+
+![](image/05.png)
+
+为了访问最原始的那个对象，需要对指针的指针做两次解引用：
+
+	cout << "The value of ival\n"
+		<< "direct value: " << ival << "\n"
+		<< "indirect value: " << *pi << "\n"
+		<< "doubly indirect value: " << **ppi
+		<< endl;
+
+#### 指向指针的引用 ####
+
+**引用本身不是一个对象，因此不能定义指向引用的指针。**但指针是对象，所以存在对指针的引用：
+
+	int i = 42;
+	int *p; // p is a pointer to int
+	int *&r = p; // r is a reference to the pointer p
+	r = &i; // r refers to a pointer; assigning &i to r makes p point to i
+	*r = 0; // dereferencing r yields i, the object to which p points; changes i to 0
+
+要理解r的类型到底是什么，最简单的办法是**从右向左阅读r的定义**。离变量名最近的符号对变量类型有最直接影响，如`int *&r = p;` ，`&r`，因此，r是一个引用。声明符的其余部分用以确定r引用的类型是什么，此例中的符号*说明r引用的是一个指针。最后，声明的基本类型部分指出r引用的是一个int指针。Finally, the base type of the declaration says that r is a reference to a pointer to an int.
 
 
-
-
-
-
-
-
-
-
-
+## const限定符 ##
 
 

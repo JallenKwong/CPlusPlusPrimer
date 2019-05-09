@@ -382,7 +382,161 @@ C++语言有几个复合类型，如 引用reference 和 指针pointer。
 
 一旦初始化完成，引用将和它的初始化对象一直绑定在一起。因为无法令引用重新绑定到另外一个对象，因此**引用必须初始化**。
 
-#### 引用即系别名 ####
+#### 引用即别名 ####
+
+引用并非对象，相反的，他只是为一个已经存在的对象所起的另外一个名字
+
+定义一个引用后，对其进行的所有操作都是在与之绑定的对象上进行的。
+
+	int ival = 1024;
+	int &refVal = ival; // refVal refers to (is another name for) ival
+	refVal = 2; // assigns 2 to the object to which refVal refers, i.e., to ival
+	int ii = refVal; // same as ii = ival
+
+
+	// ok: refVal3 is bound to the object to which refVal is bound, i.e., to ival
+	int &refVal3 = refVal;
+	
+	// initializes i from the value in the object to which refVal is bound
+	int i = refVal; // ok: initializes i to the same value as ival
+
+#### 引用定义 ####
+
+允许在一条语句中定义多个引用，其中每个引用标识符都必须以符号&开头：
+
+	int i = 1024, i2 = 2048; // i and i2 are both ints
+	int &r = i, r2 = i2; // r is a reference bound to i; r2 is an int
+	int i3 = 1024, &ri = i3; // i3 is an int; ri is a reference bound to i3
+	int &r3 = i3, &r4 = i2; // both r3 and r4 are references
+
+	int &refVal4 = 10; // error: initializer must be an object
+	double dval = 3.14;
+	int &refVal5 = dval; // error: initializer must be an int object
+
+### 指针 ###
+
+pointer是指向point to另外一种类型的复合类型。
+
+
+与reference类似的是也实现了对其他对象的间接对象。
+
+与reference不同的：
+
+1. 指针本身就是一个对象，允许对指针赋值和拷贝，而且在指针的生命周期类它可以先后指向几个不同的对象。
+2. 指针无须在定义时赋初值。和其他内置类型一样，在块作用域内定义的指针如果没有被初始化，也将拥有一个不确定的值。
+
+>**Warning**
+>
+>Pointers are often hard to understands. Debugging problems due to pointer errors bedevil even experienced programmers.
+
+	int *ip1, *ip2; // both ip1 and ip2 are pointers to int
+	double dp, *dp2; // dp2 is a pointer to double; dp is a double
+
+#### 获取对象的地址 ####
+
+指针存放某个对象的地址，要获取该地址，需要使用**取地址符&**
+
+	int ival = 42;
+	int *p = &ival; // p holds the address of ival; p is a pointer to ival
+
+	double dval;
+	double *pd = &dval; // ok: initializer is the address of a double
+	double *pd2 = pd; // ok: initializer is a pointer to double
+	int *pi = pd; // error: types of pi and pd differ
+	pi = &dval; // error: assigning the address of a double to a pointer to int
+
+因为引用不是对象，没有实际地址，所以不能定义指向引用的指针。
+
+#### 指针值 ####
+
+指针的值（即地址）应属下列4种状态之一：
+
+
+1. 指向一个对象
+2. 指向紧邻对象所占空间的下一个位置。
+3. 空指针，意味着指针没有指向任何对象。
+4. 无效指针，也就是上述情况之外的其他值。
+
+
+#### 利用指针访问对象 ####
+
+若指针指向了一个对象，则允许使用** 解引用符\* **来访问该对象
+
+	int ival = 42;
+	int *p = &ival; // p holds the address of ival; p is a pointer to ival
+	cout << *p; // * yields the object to which p points; prints 42
+
+	*p = 0; // * yields the object; we assign a new value to ival through p
+	cout << *p; // prints 0
+
+**解引用操作仅适用于那些确实指向了某个对象的有效指针。**
+
+#### 某些符号有多重含义 ####
+
+像 & 和 * 这样的符号，既能用作表达式里的运算符，也能作为声明的一部分出现，符号的上下文决定了符号的意义。
+
+	int i = 42;
+	int &r = i; // & follows a type and is part of a declaration; r is a
+	reference
+	int *p; // * follows a type and is part of a declaration; p is a
+	pointer
+	p = &i; // & is used in an expression as the address-of operator
+	*p = i; // * is used in an expression as the dereference operator
+	int &r2 = *p; // & is part of the declaration; * is the dereference operator
+
+#### 空指针 ####
+
+null pointer不指向任何对象，在试图使用一个指针之前代码可以首先检查它是否为空。
+
+	int *p1 = nullptr; // equivalent to int *p1 = 0;
+	int *p2 = 0; // directly initializes p2 from the literal constant 0
+
+	// must #include cstdlib
+	int *p3 = NULL; // equivalent to int *p3 = 0;
+
+`nullptr`，是C++11新标准刚刚引入的一种方法。
+
+过去NULL的**预处理变量preprocessor variable**，它的值相当于0。
+
+现在C++程序最好使用`nullptr`，同时尽量避免使用NULL.
+
+把int变量直接赋给指针是错误的操作，即使int变量的值恰好等于0也不行。
+
+	int zero = 0;
+	pi = zero; // error: cannot assign an int to a pointer
+
+#### 建议：初始化所有指针 ####
+
+建议初始化所有的指针，并且可能的情况下，尽量等定义了对象之后再定义指向它的指针。 如果实在不清楚指针应该指向何处，就把它初始化为nullptr或者0，这样程序就能检测并知道它没有指向任何具体的对象了。
+
+
+#### 赋值和指针 ####
+
+指针和引用都能提供对其他对象的间接访问，然而在具体实现细节上两者有很大不同，其中最重要的一点就是**引用本身并非一个对象**。
+
+一旦定义了引用，就**无法**令其再绑定到另外的对象，之后每次使用这个引用都是访问它最初绑定的那个对象。
+
+指针和它存放的地址之间就没有这种限制了。和其他任何变量（只要不是引用）一样，给指针赋值就是令它存放一个新的对象。
+
+	int i = 42;
+	int *pi = 0; // pi is initialized but addresses no object
+	int *pi2 = &i; // pi2 initialized to hold the address of i
+	int *pi3; // if pi3 is defined inside a block, pi3 is uninitialized
+	pi3 = pi2; // pi3 and pi2 address the same object, e.g., i
+	pi2 = 0; // pi2 now addresses no object
+
+有时要搞清楚一条赋值语句到底是改变了指针的值还是改变了指针所指对象的值不太容易，**最好的办法就是记住赋值永远改变的是等号左侧的对象**。
+
+	pi = &ival; // value in pi is changed; pi now points to ival
+
+	*pi = 0; // value in ival is changed; pi is unchanged;*pi（也就是指针pi指向的那个对象）发生改变。
+
+#### 其他指针操作 ####
+
+
+
+
+
 
 
 

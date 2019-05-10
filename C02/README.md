@@ -637,4 +637,31 @@ null pointer不指向任何对象，在试图使用一个指针之前代码可�
 
 ## const限定符 ##
 
+有时希望定义这样一种变量，它的值不能被改变。
+
+例如，用一个变量来表示缓冲区的大小。使用变量的好处是当我们觉得缓冲区大小不再合适时，很容易对其进行调整。
+
+另一方面，也随时警惕防止程序一不小心改变了这个值。
+
+因此，使用关键字`const`对变量的类型加以限定：
+
+	const int bufSize = 512; // input buffer size
+
+	bufSize = 512; // error: attempt to write to const object
+
+const对象一旦创建后其值就不能再改变，所以对象必须初始化。
+
+	const int i = get_size(); // ok: initialized at run time
+	const int j = 42; // ok: initialized at compile time
+	const int k; // error: k is uninitialized const
+
+#### 初始化和const ####
+
+与非const类型所能参与的操作相比，const类型的对象能完成其中大部分，但不是所有操作适合。主要限制就是只能在const类型的对象上执行不改变其内容的操作。
+
+	int i = 42;
+	const int ci = i; // ok: the value in i is copied into ci
+	int j = ci; // ok: the value in ci is copied into j
+
+#### 默认状态下，const对象仅在文件内有效 ####
 

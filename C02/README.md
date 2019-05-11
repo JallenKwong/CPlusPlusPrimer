@@ -637,6 +637,8 @@ null pointer不指向任何对象，在试图使用一个指针之前代码可�
 
 ## const限定符 ##
 
+>PS.类似Java的final修饰变量
+
 有时希望定义这样一种变量，它的值不能被改变。
 
 例如，用一个变量来表示缓冲区的大小。使用变量的好处是当我们觉得缓冲区大小不再合适时，很容易对其进行调整。
@@ -664,4 +666,169 @@ const对象一旦创建后其值就不能再改变，所以对象必须初始化
 	int j = ci; // ok: the value in ci is copied into j
 
 #### 默认状态下，const对象仅在文件内有效 ####
+
+	const int bufSize = 512; // input buffer size
+
+编译器将在编译过程中把用到该变量的地方都替换成对应的值。
+
+若进行替换，编译器必须知道变量的初始值。若程序包含多个文件，则每个用了const对象的文件都必须得能访问到它的初始值才行。
+
+为了支持这一用法，同时避免同一变量的重复定义，**默认情况下，const对象被设定为仅在文件内有效。**当多个文件中出现了同名的const变量时，其实等同于在不同文件中分别定义了独立的变量。
+
+解决方法如下：
+
+	// file_1.cc defines and initializes a const that is accessible to other files
+	extern const int bufSize = fcn();
+
+	// file_1.h
+	extern const int bufSize; // same bufSize as defined in file_1.cc
+
+file1_1.h头文件中的声明也由extern做了限定，其作用是**指明bufSize并非本文件所独有，它的定义将在别处出现**。
+
+
+**如果想在多个文件之间共享const对象，必须在变量的定义之前添加extern关键字。**
+
+### const的引用 ###
+
+可以把引用绑定到const对象上，就像绑定到其他对象上一样，称之为**对常量的引用reference to const**。与普通引用不同的是，对常量的引用不能被用作修改它所绑定的对象。
+
+	const int ci = 1024;
+	const int &r1 = ci; // ok: both reference and underlying object are const
+	r1 = 42; // error: r1 is a reference to const
+	int &r2 = ci; // error: non const reference to a const object
+
+**术语：常量是对const的引用**
+
+#### 初始化和对const的引用 ####
+
+
+允许为一个常量引用绑定非常量的对象、字面量，甚至是个一般表达式：
+
+	int i = 42;
+	const int &r1 = i; // we can bind a const int& to a plain int object
+	const int &r2 = 42; // ok: r1 is a reference to const
+	const int &r3 = r1 * 2; // ok: r3 is a reference to const
+	int &r4 = r * 2; // error: r4 is a plain, non const reference
+
+---
+
+	double dval = 3.14;
+	const int &ri = dval;
+
+为了使上述代码工作，编译器把上述代码变成了如下形式：
+
+	const int temp = dval; // create a temporary const int from the double
+	const int &ri = temp; // bind ri to that temporary
+
+在这种情况下，ri绑定了一个**临时量temporary**
+
+程序员既然让ri引用dval，就肯定想通过ri改变dval的值，否则为什么要给ri赋值呢？因此，上述行为被C++归为非法。
+
+#### 对const的引用可能引用一个并非const的对象 ####
+
+	int i = 42;
+	int &r1 = i; // r1 bound to i
+	const int &r2 = i; // r2 also bound to i; but cannot be used to change i
+	r1 = 0; // r1 is not const; i is now 0
+	r2 = 0; // error: r2 is a reference to const
+
+### 指针和const ###
+
+**指向常量的指针pointer to const**不能用于改变其所指对象的值。要想存放常量对象的地址，只能够使用指向常量的指针。
+
+	const double pi = 3.14; // pi is const; its value may not be changed
+	double *ptr = &pi; // error: ptr is a plain pointer
+	const double *cptr = &pi; // ok: cptr may point to a double that is const
+	*cptr = 42; // error: cannot assign to *cptr
+
+---
+
+指针的类型必须与其所指对象的类型一致。但是有**例外**，是允许令一个指向常量的指针指向一个非常量对象。
+
+	double dval = 3.14; // dval is a double; its value can be changed
+	cptr = &dval; // ok: but can't change dval through cptr
+
+试想：所谓指向常量的指针或引用，不过是指针或引用“自以为是”罢了，它们觉得自己指向了常量，所以自觉地不去改变所指对象的值。
+
+
+#### const指针 ####
+
+**指针是对象而引用不是**，因此就像其他对象类型一样，允许把指针本身定为常量。
+
+常量指针const pointer必须初始化，而且一旦初始化完成，则它的值（也就是存放在指针中的那个地址）就不能再改变了。
+
+把`*`放在const关键字之前用以说明指针是一个常量，这样的书写形式隐含着一层意味，即**不变的是指针本身的值**而非指向的那个值：
+
+	int errNumb = 0;
+	int *const curErr = &errNumb; // curErr will always point to errNumb
+	
+	const double pi = 3.14159;
+	const double *const pip = &pi; // pip is a const pointer to a const object
+
+**想要弄清楚这些声明的含义最行之有效的办法是从右向左阅读。**
+
+指针本身是一个常量并不意味着不能通过指针修改其所指对象的值，能否这样做完全依赖于所指对象的类型。
+
+	*pip = 2.72; // error: pip is a pointer to const
+	// if the object to which curErr points (i.e., errNumb) is nonzero
+
+	if (*curErr) {
+		errorHandler();
+		*curErr = 0; // ok: reset the value of the object to which curErr is bound
+	}
+
+### 顶层const ##
+
+指针本身是一个对象，它又可以指向另外一个对象。
+
+因此，**指针本身是不是常量** 以及 **指针所指的是不是一个常量** 就是两个相互独立的问题。
+
+**顶层const** (top-level const)表示指针本身是个常量。
+
+**底层const** (low-level const)表示指针所指的对象是一个常量。
+
+更一般的，**顶层const**可以表示任意的对象是常量，这一点对任何数据类型都适用，如算术类型、类、指针等。
+
+**底层const**则与指针和引用等复合类型的基本类型部分有关。
+
+特殊的是，**指针类型**既可以是顶层const也可以是底层const
+
+
+	int i = 0;
+	int *const p1 = &i; // we can't change the value of p1; const is top-level
+	const int ci = 42; // we cannot change ci; const is top-level//??? Is ci a pointer?
+	
+	const int *p2 = &ci; // we can change p2; const is low-level
+	const int &r = ci; // const in reference types is always low-level
+
+	const int *const p3 = p2; // right-most const is top-level, left-most is not
+
+---
+
+	i = ci; // ok: copying the value of ci; top-level const in ci is ignored
+	p2 = p3; // ok: pointed-to type matches; top-level const in p3 is ignored
+
+执行拷贝操作并不会改变被拷贝对象的值，因此，拷入和拷出的对象是否是常量都没什么影响。
+
+当执行对象的拷贝操作时，拷入和拷出的对象必须具有相同的底层const资格，或者两个对象的数据类型必须能够转换。
+
+	int *p = p3; // error: p3 has a low-level const but p doesn't
+	p2 = p3; // ok: p2 has the same low-level const qualification as p3
+	p2 = &i; // ok: we can convert int* to const int*
+	int &r = ci; // error: can't bind an ordinary int& to a const int object
+	const int &r2 = i; // ok: can bind const int& to plain int
+
+### constexpr和常量表达式 ###
+
+
+
+
+
+
+
+
+
+
+
+
 

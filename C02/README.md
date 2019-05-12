@@ -820,7 +820,88 @@ file1_1.h头文件中的声明也由extern做了限定，其作用是**指明buf
 
 ### constexpr和常量表达式 ###
 
+C++ 新标准规定，允许声明为`constexpr`类型以便有编译器来验证变量的值是否是一个常量表达式。
 
+声明为constexpr的变量一定是一个常量，而且必须用常量表达式初始化：
+
+	const int max_files = 20; // max_files is a constant expression
+	const int limit = max_files + 1; // limit is a constant expression
+	int staff_size = 27; // staff_size is not a constant expression
+	const int sz = get_size(); // sz is not a constant expression
+
+最佳实践：一般来说，如果认定变量是一个常量表达式，那就把它声明成`constexpr`类型
+
+#### 字面值类型 ####
+
+常量表达式的值需要在编译时就得到计算，因此对声明constexpr时用到的类型必须有所限制。因为这些类型一般比较简单，值显而易见，就称之为 **字面值类型literal type**。
+
+算术类型、引用和指针都属于字面值类型。自定义类、IO库、string类型则不属于字面值类型，也就不能被定义为constexpr。
+
+尽管指针和引用都能定义为constexpr，但它们的初始值却手到严格限制。一个constexpr指针的初始值必须是nullptr或者0，或者是存储于某个固定地址中的对象。
+
+
+#### 指针和constexpr ####
+
+必须明确一点，在constexpr声明中如果定义了一个指针，限定符constexpr仅对指针有效，与指针所指对象无关：
+
+	const int *p = nullptr; // p is a pointer to a const int
+	constexpr int *q = nullptr; // q is a const pointer to int
+
+p和q类型相差甚远，p是一个指向常量的指针，而q是一个常量指针，其中的关键在于constexpr把它所定义的对象置为了顶层const。
+
+	constexpr int *np = nullptr; // np is a constant pointer to int that is null
+	int j = 0;
+	constexpr int i = 42; // type of i is const int
+	
+	// i and j must be defined outside any function
+	constexpr const int *p = &i; // p is a constant pointer to the const int i
+	constexpr int *p1 = &j; // p1 is a constant pointer to the int j
+
+## 处理类型 ##
+
+### 类型别名 ###
+
+**类型别名type alias** 是一个名字，它是某种类型的同义词。使用类型别名的好处能让复杂类型名字简单明了。
+
+有**两种方法**可用于定义类型别名。
+
+1.使用关键字typedef
+
+	typedef double wages; // wages is a synonym for double
+	typedef wages base, *p; // base is a synonym for double, p for double*
+
+2.新规定，使用**别名声明alias declaration**来定义类型的别名，使用关键字using。
+
+	using SI = Sales_item; // SI is a synonym for Sales_item
+
+类型别名和类型的名字等价，只要是类型的名字能出现的地方，就使用类型别名。
+
+	wages hourly, weekly; // same as double hourly, weekly;
+	SI item; // same as Sales_item item
+
+#### 指针、常量和类型别名 ####
+
+如果某个类型别名指代的是复合类型或常量，那么把它用到声明语句里就会产生意想不到的后果。
+
+	typedef char *pstring;
+	const pstring cstr = 0; // cstr is a constant pointer to char 
+	const pstring *ps; // ps is a pointer to a constant pointer to char
+
+遇到一条使用了声明类型语句时，错误理解为：
+
+	const char *cstr = 0; // wrong interpretation of const pstring cstr
+
+声明语句用到 pstring时，其基本数据类型是指针。
+
+可是用`char*`重写了声明语句后，数据类型就变成了char，*称为了声明符的一部分。
+
+这样改写的结果是，const char成了基本数据类型。
+
+前后两种声明含义截然不同，**前者**声明了一个指向char的常量指针，**后者**改写的形式则声明了指向const char 的指针。
+
+>PS. 好麻烦啊~
+
+### auto类型说明符 ###
 
 
 

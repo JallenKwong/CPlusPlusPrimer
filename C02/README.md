@@ -903,6 +903,56 @@ p和q类型相差甚远，p是一个指向常量的指针，而q是一个常量�
 
 ### auto类型说明符 ###
 
+C++新标准引入了`auto`类型说明符，用它就能让编译器替我们去分析表达式所属的类型。和原来那些只对应一种特定类型的说明符（比如double）不同，auto让编译器通过初始值来推算变量类型。显然，auto必须有初始值。
+
+	// the type of item is deduced from the type of the result of adding val1 and val2
+	auto item = val1 + val2; // item initialized to the result of val1 + val2
+
+	auto i = 0, *p = &i; // ok: i is int and p is a pointer to int
+	auto sz = 0, pi = 3.14; // error: inconsistent types for sz and pi
+
+#### 复合类型、常量和auto ####
+
+编译器推断出来的auto类型有时候和初始值的类型并不完全一样，编译器会适当地改变结果类型使其更符合初始化规则。
+
+当引用被用作初始值时，真正参与初始化的其实是引用对象的值。
+
+	int i = 0, &r = i;
+	auto a = r; // a is an int (r is an alias for i, which has type int)
+
+auto一般会忽略掉**顶层const**，同时**底层const**则会保留下来，比如当初始值是一个指向常量的指针时。
+
+	const int ci = i, &cr = ci;
+	auto b = ci; // b is an int (top-level const in ci is dropped)
+	auto c = cr; // c is an int (cr is an alias for ci whose const is top-level)
+	auto d = &i; // d is an int*(& of an int object is int*)
+	auto e = &ci; // e is const int*(& of a const object is low-level const)
+
+如果希望推断出的auto类型是一个顶层const，需明确指出：
+
+	const auto f = ci; // deduced type of ci is int; f has type const int
+
+还可以将引用类型设为auto
+
+	auto &g = ci; // g is a const int& that is bound to ci
+	auto &h = 42; // error: we can't bind a plain reference to a literal
+	const auto &j = 42; // ok: we can bind a const reference to a literal
+
+要在一条语句中定义多个变量，切记，**符号&和*只从属于某个声明符**，**而非基本数据类型的一部分**，因此初始值必须是同一种类型
+
+	auto k = ci, &l = i; // k is int; l is int&
+	auto &m = ci, *p = &ci; // m is a const int&;p is a pointer to const int
+	// error: type deduced from i is int; type deduced from &ci is const int
+	auto &n = i, *p2 = &ci;
+
+### decltype类型指示符 ###
+
+
+
+
+
+
+
 
 
 

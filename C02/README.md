@@ -1,5 +1,145 @@
 # 变量和基本类型 #
 
+[1.基本内置类型](#基本内置类型)
+
+[1.1.算术类型](#算术类型)
+
+[1.1.1.带符号类型和无符号类型](#带符号类型和无符号类型)
+
+[1.1.2.如何选择合适类型](#如何选择合适类型)
+
+[1.2.类型转换](#类型转换)
+
+[1.2.1.含有无符号类型的表达式](#含有无符号类型的表达式)
+
+[1.3.字面值常量](#字面值常量)
+
+[1.3.1.整型和浮点型字面量](#整型和浮点型字面量)
+
+[1.3.2.字符和字符串字面值](#字符和字符串字面值)
+
+[1.3.3.转义序列](#转义序列)
+
+[1.3.4.指定字面值的类型](#指定字面值的类型)
+
+[1.3.5.布尔字面值和指针字面值](#布尔字面值和指针字面值)
+
+[2.变量](#变量)
+
+[2.1.变量定义](#变量定义)
+
+[2.1.1.何为对象](#何为对象)
+
+[2.1.2.初始值](#初始值)
+
+[2.1.3.列表初始化](#列表初始化)
+
+[2.1.4.默认初始化](#默认初始化)
+
+[2.2.变量声明和定义的关系](#变量声明和定义的关系)
+
+[2.2.1.静态类型](#静态类型)
+
+[2.3.标识符](#标识符)
+
+[2.3.1.变量命名规范](#变量命名规范)
+
+[2.4.名字的作用域](#名字的作用域)
+
+[2.4.1.嵌套作用域](#嵌套作用域)
+
+[3.复合类型](#复合类型)
+
+[3.1.引用](#引用)
+
+[3.1.1.引用即别名](#引用即别名)
+
+[3.1.2.引用定义](#引用定义)
+
+[3.2.指针](#指针)
+
+[3.2.1.获取对象的地址](#获取对象的地址)
+
+[3.2.2.指针值](#指针值)
+
+[3.2.3.利用指针访问对象](#利用指针访问对象)
+
+[3.2.4.某些符号有多重含义](#某些符号有多重含义)
+
+[3.2.5.空指针](#空指针)
+
+[3.2.6.建议：初始化所有指针](#建议初始化所有指针)
+
+[3.2.7.赋值和指针](#赋值和指针)
+
+[3.2.8.其他指针操作](#其他指针操作)
+
+[3.2.9.void*指针](#void*指针)
+
+[3.3.理解复合类型的声明](#理解复合类型的声明)
+
+[3.3.1.定义多个变量](#定义多个变量)
+
+[3.3.2.指向指针的指针](#指向指针的指针)
+
+[3.3.3.指向指针的引用](#指向指针的引用)
+
+[4.const限定符](#const限定符)
+
+[4.初始化和const](#初始化和const)
+
+[4.默认状态下，const对象仅在文件内有效](#默认状态下const对象仅在文件内有效)
+
+[4.1.const的引用](#const的引用)
+
+[4.1.1.初始化和对const的引用](#初始化和对const的引用)
+
+[4.1.2.对const的引用可能引用一个并非const的对象](#对const的引用可能引用一个并非const的对象)
+
+[4.2.指针和const](#指针和const)
+
+[4.2.1.const指针](#const指针)
+
+[4.3.顶层const](#顶层const)
+
+[4.4.constexpr和常量表达式](#constexpr和常量表达式)
+
+[4.4.1.字面值类型](#字面值类型)
+
+[4.4.2.指针和constexpr](#指针和constexpr)
+
+[5.处理类型](#处理类型)
+
+[5.1.类型别名](#类型别名)
+
+[5.1.1.指针、常量和类型别名](#指针常量和类型别名)
+
+[5.2.auto类型说明符](#auto类型说明符)
+
+[5.2.1.复合类型、常量和auto](#复合类型常量和auto)
+
+[5.3.decltype类型指示符](#decltype类型指示符)
+
+[5.3.1.delctype和引用](#delctype和引用)
+
+[6.自定义数据结构](#自定义数据结构)
+
+[6.1.定义Sales_data类型](#定义salesdata类型)
+
+[6.2.使用Sales_data类](#使用salesdata类)
+
+[6.2.1.添加两个Sales_data](#添加两个salesdata)
+
+[6.2.2.Sales_data对象读入数据](#salesdata对象读入数据)
+
+[6.2.3.输出两个Sales_data对象的和](#输出两个salesdata对象的和)
+
+[6.3.编写自己的头文件](#编写自己的头文件)
+
+[6.3.1.预处理器概述](#预处理器概述)
+
+[7.小结](#小结)
+
 ## 基本内置类型 ##
 
 C++定义了一套包括
@@ -947,19 +1087,171 @@ auto一般会忽略掉**顶层const**，同时**底层const**则会保留下来�
 
 ### decltype类型指示符 ###
 
+有时希望从表达式的类型推断出要定义的变量，但是不想用该表达式的值初始化变量。C++新标准引入第二个类型说明符decltype，它的作用是选择并返回操作数的数据类型。
+
+	decltype(f()) sum = x; // sum has whatever type f returns
+
+如果`decltype`使用的表达式是一个变量，则decltype返回该变量的类型
+
+	const int ci = 0, &cj = ci;
+	decltype(ci) x = 0; // x has type const int
+	decltype(cj) y = x; // y has type const int& and is bound to x
+	decltype(cj) z; // error: z is a reference and must be initialized
+
+需要指出的是，引用从来都作为其所指对象的同义词出现。
+
+#### delctype和引用 ####
+
+	// decltype of an expression can be a reference type
+	int i = 42, *p = &i, &r = i;
+	decltype(r + 0) b; // ok: addition yields an int; b is an (uninitialized) int
+	decltype(*p) c; // error: c is int& and must be initialized
+
+	// decltype of a parenthesized variable is always a reference
+	decltype((i)) d; // error: d is int& and must be initialized
+	decltype(i) e; // ok: e is an (uninitialized) int
+
+## 自定义数据结构 ##
+
+### 定义Sales_data类型 ###
+
+	struct Sales_data {
+		std::string bookNo;//初始化为空字符串
+		unsigned units_sold = 0;
+		double revenue = 0.0;
+	};
+
+	struct Sales_data { /* ... */ } accum, trans, *salesptr;
+	// equivalent, but better way to define these objects
+	struct Sales_data { /* ... */ };
+	Sales_data accum, trans, *salesptr;
+
+括号内的称为**数据变量data member**
+
+C++11新标准规定，可以为数据成员提供一个**类内初始值in-class initiallizer**。
+
+C++语言提供的另外一个关键字`class`来定义自己的数据结构
+
+### 使用Sales_data类 ###
+
+程序输入：
+
+	0-201-78345-X 3 20.00
+	0-201-78345-X 2 25.00
+
+#### 添加两个Sales_data ####
+
+程序结构如下：
+
+	#include <iostream>
+	#include <string>
+	#include "Sales_data.h"
+	int main()
+	{
+		Sales_data data1, data2;
+		// code to read into data1 and data2
+		// code to check whether data1 and data2 have the same ISBN
+		// and if so print the sum of data1 and data2
+	}
+
+#### Sales_data对象读入数据 ####
+
+读入两组数据
+
+	double price = 0; // price per book, used to calculate total revenue
+	// read the first transactions: ISBN, number of books sold, price per book
+	std::cin >> data1.bookNo >> data1.units_sold >> price;
+	// calculate total revenue from price and units_sold
+	data1.revenue = data1.units_sold * price;
+
+	// read the second transaction
+	std::cin >> data2.bookNo >> data2.units_sold >> price;
+	data2.revenue = data2.units_sold * price;
+
+#### 输出两个Sales_data对象的和 ####
+
+	if (data1.bookNo == data2.bookNo) {
+		unsigned totalCnt = data1.units_sold + data2.units_sold;
+		double totalRevenue = data1.revenue + data2.revenue;
+
+		// print: ISBN, total sold, total revenue, average price per book
+		std::cout << data1.bookNo << " " << totalCnt
+				<< " " << totalRevenue << " ";
+		if (totalCnt != 0)
+			std::cout << totalRevenue/totalCnt << std::endl;
+		else
+			std::cout << "(no sales)" << std::endl;
+		return 0; // indicate success
+
+	} else { // transactions weren't for the same ISBN
+		std::cerr << "Data must refer to the same ISBN"
+		<< std::endl;
+		return -1; // indicate failure
+	}
+
+[main.cpp](C02_1/main.cpp)
+
+### 编写自己的头文件 ###
+
+函数内可定义类，但一般不这样做。
+
+**为了确保各个文件中类的定义一致，类通常被定义在头文件中**，而且类所在头文件的名字应与类的名字一样。如Sales_data类定义在名为Sales_data.h的头文件中。
+
+头文件通常包含那些只能被定义一次的实体，如const和constexpr变量等。
+
+头文件也经常用到其他头文件功能。
+
+**头文件一旦改变，相关的源文件必须重新编译以获取更新过的声明。**
 
 
+#### 预处理器概述 ####
 
+确保头文件多次包含人能安全工作的常用技术为**预处理器preprocessor**。
 
+预处理器是在编译之前执行的一段程序，可以部分地改变我们所写的程序。
 
+之前已经用到了一项预处理器功能`#include`，当预处理器看到`#include`标记时就会指定的头文件的内容代替`#include`。
 
+C++程序会用到一项预处理功能是**头文件保护符header guard**，头**文件保护符**依赖于**预处理变量**。
 
+预处理变量有两种状态：
 
+1. 已定义
+2. 未定义
 
+`#define`把一个名字设置为**预处理变量**。
 
+另外两个指令则分别检查某个指定的**预处理变量**是否已经定义：
 
+`#ifdef`当且仅当变量已定义时为真。
 
+`#ifndef`当且仅当变量未定义时为真。一旦检查结果为真，则执行后续操作直至遇到`#endif`。
 
+使用这些功能就能有效地防止重复包含的发生：
 
+	#ifndef SALES_DATA_H
+	#define SALES_DATA_H
+	#include <string>
+	struct Sales_data {
+		std::string bookNo;
+		unsigned units_sold = 0;
+		double revenue = 0.0;
+	};
+	#endif
 
+[Sales_data.h](C02_1/Sales_data.h)
+
+**预处理变量无视C++语言中关于作用域的规则。**
+
+整个程序中的预处理变量包括头文件保护符必须唯一，通常做法是基于头文件中类的名字来构建保护符的名字，以确保其唯一性。
+
+为了避免与程序中的其他实体发生名字冲突，一般把预处理器的名字全部大写。
+
+**头文件即使（目前还）没有被包含在任何其他头文件中，也应该设置保护符。**
+
+## 小结 ##
+
+***运算符**解引用运算符。解引用一个指针将返回该指针所指的对象，**为解引用的结果赋值**也就是**为指针所指的对象赋值**。
+
+**顶层const top-level const**是一个const，规定某对象的值不能改变。
 

@@ -198,6 +198,8 @@ C++语言规定一个int至少和一个short一样大，一个long至少和一�
 
 #### 带符号类型和无符号类型 ####
 
+[unsigned_](C02_2/functions.h#unsigned_)
+
 除去布尔型和扩展的字符型之外，其它整型可以划分为
 
 1. 带符号的signed 可表示正数、负数、0
@@ -220,6 +222,8 @@ A few rules of thumb can be useful in deciding which type to use:
 - **Use `double` for floating-point computations; `float` usually does not have enough precision, and the cost of double-precision calculations versus single-precision is negligible微不足道的，可以忽略的.** In fact, on some machines, double-precision operations are faster than single. The precision offered by `long double` usually is unnecessary and often entails considerable run-time cost.
 
 ### 类型转换 ###
+
+[convs](C02_2/functions.h#convs)
 
 Type Conversions
 
@@ -297,6 +301,8 @@ literal
 
 #### 转义序列 ####
 
+[escape](C02_2/functions.h#escape)
+
 有两类字符不可直接使用
 
 1. 不可打印的，如退格或其他控制字符
@@ -355,6 +361,8 @@ Still others distinguish between **objects** and **values**, using the term obje
 **最后，我们认为对象是具有某种类型的内存空间**。
 
 #### 初始值 ####
+
+[inits](C02_2/functions.h#inits)
 
 An object that is **initialized** gets the specified value at the moment it is created.
 
@@ -455,6 +463,8 @@ Identifiers are case-sensitive; upper- and lowercase letters are distinct:大小
 
 ### 名字的作用域 ###
 
+[scope_levels](C02_2/functions.h#scope_levels)
+
 无论是在程序的什么位置，使用到的每个名字都会指向一个特定的实体：变量、函数、类型等。**然而，同一个名字如果出现在程序的不同位置，也可能指向的是不同的实体**。
 
 	#include <iostream>
@@ -504,6 +514,8 @@ Identifiers are case-sensitive; upper- and lowercase letters are distinct:大小
 
 ## 复合类型 ##
 
+[compounddecls](C02_2/functions.h#compounddecls)
+
 compound type是指基于其他类型定义的类型。
 
 C++语言有几个复合类型，如 引用reference 和 指针pointer。
@@ -511,6 +523,8 @@ C++语言有几个复合类型，如 引用reference 和 指针pointer。
 一条声明语句由一个**基本数据类型base type**和紧随其后的一个**声明符declarator**列表组成的。每个**声明符**命名了一个变量并指定该变量为与基本数据类型有关的某种类型。
 
 ### 引用 ###
+
+[ref_ex](C02_2/functions.h#ref_ex)
 
 引用reference为对象起了另外一个名字，引用类型**引用refers to** 另外一种类型。通过将声明符写成&d的形式来**定义引用类型**，其中d是声明的变量名：
 
@@ -739,6 +753,8 @@ null pointer不指向任何对象，在试图使用一个指针之前代码可�
 **建议：将*（或是&）与变量名连在一起**
 
 #### 指向指针的指针 ####
+
+[dbl_ptr](C02_2/functions.h#dbl_ptr)
 
 指针是内存中的对象，像其他对象一样也有自己的地址，因此允许把指针的地址再存放到另一个指针当中。
 
@@ -1086,6 +1102,8 @@ auto一般会忽略掉**顶层const**，同时**底层const**则会保留下来�
 	auto &n = i, *p2 = &ci;
 
 ### decltype类型指示符 ###
+
+[decl_ex](C02_2/functions.h#decl_ex)
 
 有时希望从表达式的类型推断出要定义的变量，但是不想用该表达式的值初始化变量。C++新标准引入第二个类型说明符decltype，它的作用是选择并返回操作数的数据类型。
 

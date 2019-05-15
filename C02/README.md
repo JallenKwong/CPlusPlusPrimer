@@ -124,15 +124,15 @@
 
 [6.自定义数据结构](#自定义数据结构)
 
-[6.1.定义Sales_data类型](#定义salesdata类型)
+[6.1.定义Sales_data类型](#定义sales_data类型)
 
-[6.2.使用Sales_data类](#使用salesdata类)
+[6.2.使用Sales_data类](#使用sales_data类)
 
-[6.2.1.添加两个Sales_data](#添加两个salesdata)
+[6.2.1.添加两个Sales_data](#添加两个sales_data)
 
-[6.2.2.Sales_data对象读入数据](#salesdata对象读入数据)
+[6.2.2.Sales_data对象读入数据](#sales_data对象读入数据)
 
-[6.2.3.输出两个Sales_data对象的和](#输出两个salesdata对象的和)
+[6.2.3.输出两个Sales_data对象的和](#输出两个sales_data对象的和)
 
 [6.3.编写自己的头文件](#编写自己的头文件)
 

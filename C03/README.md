@@ -220,7 +220,189 @@ Using rule 1, we see that `str` is less than `phrase`. By applying rule 2, we se
 
 	string s7 = ("hello" + ", ") + s2; // error: can't add string literals
 
+### 处理string对象中的字符 ###
+
+![](image/03.png)
+
+**建议**：使用C++版本的C标准库头文件
+
+#### 处理每个字符？使用基于范围的for语句 ####
+
+使用C++11新标准提供的一种语句：**范围for（range for）**
+
+	for (declaration : expression)
+		statement
+
+---
+
+	//使用示例
+	string str("some string");
+
+	// print the characters in str one character to a line
+	for (auto c : str) // for every char in str
+		cout << c << endl; // print the current character followed by a newline
+
+---
+
+	string s("Hello World!!!");
+
+	// punct_cnt has the same type that s.size returns; 
+	decltype(s.size()) punct_cnt = 0;
+
+	// count the number of punctuation characters in s
+	for (auto c : s) // for every char in s
+		if (ispunct(c)) // if the character is punctuation
+			++punct_cnt; // increment the punctuation counter
+
+	cout << punct_cnt << " punctuation characters in " << s << endl;
+
+输出结果
+
+	3 punctuation characters in Hello World!!!
+
+#### 使用范围for语句改变字符串中的字符 ####
+
+若想改变string对象中的字符的值，必须把循环变量定义成引用类型。
+
+	string s("Hello World!!!");
+	// convert s to uppercase
+	for (auto &c : s) // for every char in s (note: c is a reference)
+		c = toupper(c); // c is a reference, so the assignment changes the char in s
+
+	cout << s << endl;
+
+输出结果为
+
+	HELLO WORLD!!!
+
+#### 只处理一部分字符？ ####
+
+使用**下标运算符[]**，它接收的输入参数是string::size_type类型的值，这个参数表示要访问的字符的位置；返回值是该位置上的字符的引用
+
+string对象的下标必须大于等于0而小于s.size()，超出范围引发不可预知的结果。
+
+---
+
+输出对象中的第一个字符：
+
+	if (!s.empty()) // make sure there's a character to print
+		cout << s[0] << endl; // print the first character in s
+
+字符串头字母改成大写
+
+	string s("some string");
+	if (!s.empty()) // make sure there's a character in s[0]
+		s[0] = toupper(s[0]); // assign a new value to the first character in s
+
+#### 使用下标执行迭代 ####
+
+	// process characters in s until we run out of characters or we hit a whitespace
+	for (decltype(s.size()) index = 0;
+		index != s.size() && !isspace(s[index]); ++index)
+			s[index] = toupper(s[index]); // capitalize the current character
+
+**提示：注意检查下标的合法性**
+
+#### 使用下标执行随机访问 ####
+
+	const string hexdigits = "0123456789ABCDEF"; // possible hex digits
+	cout << "Enter a series of numbers between 0 and 15"
+		<< " separated by spaces. Hit ENTER when finished: "
+		<< endl;
+
+	string result; // will hold the resulting hexify'd string
+	string::size_type n; // hold numbers from the input
+	while (cin >> n)
+		if (n < hexdigits.size()) // ignore invalid input
+			result += hexdigits[n]; // fetch the indicated hex digit
+	cout << "Your hex number is: " << result << endl;
+
+输入：
+
+	12 0 5 15 8 15
+
+输出：
+
+	Your hex number is: C05F8F
+
 ## 标准库类型vector ##
+
+vector表示对象的集合，其中所有对象的类型都相同。集合中的每个对象都有一个与之对应的索引，索引用于访问对象。
+
+因为vector容纳着其他对象，所以也被称为**容器container**
+
+要想使用vector，必须包含适当的头文件。
+
+	#include <vector>
+	using std::vector;
+
+C++既有**类模板class template**，也有函数模板，其中vector是一个类模板。
+
+**模板**本身不是类或函数，相反可将模板看作为编译器生成类或函数编写的一份说明。编译器根据模板创建类或函数的过程称为**实例化instantiation**，当使用模板时，需要指出编译器应把类或函数实例化成何种类型。
+
+对于类模板来说，我们通过**提供一些额外信息**来指定模板到底实例化成什么样的类，需要提供哪些信息由模板决定。提供信息的方式即在模板名字后面跟一对尖括号，在括号内放上信息。
+
+以vector为例，提供额外信息是vector内所存放对象的类型：
+
+	vector<int> ivec; // ivec holds objects of type int
+	vector<Sales_item> Sales_vec; // holds Sales_items
+	vector<vector<string>> file; // vector whose elements are vectors
+
+vector 能容纳绝大多数类型的对象称为**其元素**，但是因为引用不是对象，所以不存在包含引用的vector。除此之外，其他大多数（非引用）内置类型和类类型都可以构成vector对象，甚至组成vector的元素也可以是vector。
+
+老式编译器需要有**一个空格**在声明vector的vector
+
+	vector<vector<int> >
+
+### 定义和初始化vector对象 ###
+
+![](image/04.png)
+
+	vector<string> svec; // default initialization; svec has no elements
+
+	vector<int> ivec; // initially empty
+	// give ivec some values
+	vector<int> ivec2(ivec); // copy elements of ivec into ivec2
+	vector<int> ivec3 = ivec; // copy elements of ivec into ivec3
+	vector<string> svec(ivec2); // error: svec holds strings, not ints
+
+#### 列表初始化vector对象 ####
+
+C++11新标准
+
+	vector<string> articles = {"a", "an", "the"};
+
+	vector<string> v1{"a", "an", "the"}; // list initialization
+	vector<string> v2("a", "an", "the"); // error
+
+#### 创建指定数量的元素 ####
+
+	vector<int> ivec(10, -1); // ten int elements, each initialized to -1
+	vector<string> svec(10, "hi!"); // ten strings; each element is "hi!"
+
+#### 值初始化 ####
+
+通常情况下，可以只提供vector对象容纳的元素数组而不用略去初始值。此时库会创建一个**值初始化的value-initialized**元素初值，并把它赋给容器中所有元素。这个初值有vector对象中元素的类型决定
+
+	vector<int> ivec(10); // ten elements, each initialized to 0
+	vector<string> svec(10); // ten elements, each an empty string
+
+#### 列表初始值还是元素数量？ ####
+
+在某些情况下，初始化的真实含义依赖于传递初始值时用的是花括号还是圆括号。
+
+	vector<int> v1(10); // v1 has ten elements with value 0
+	vector<int> v2{10}; // v2 has one element with value 10
+	vector<int> v3(10, 1); // v3 has ten elements with value 1
+	vector<int> v4{10, 1}; // v4 has two elements with values 10 and 1
+
+	vector<string> v5{"hi"}; // list initialization: v5 has one element
+	vector<string> v6("hi"); // error: can't construct a vector from a string
+	literal
+	vector<string> v7{10}; // v7 has ten default-initialized elements
+	vector<string> v8{10, "hi"}; // v8 has ten elements with value "hi"
+
+### 向vector对象中添加元素 ###
 
 ## 迭代器介绍 ##
 

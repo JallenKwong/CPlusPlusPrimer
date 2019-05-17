@@ -404,6 +404,84 @@ C++11新标准
 
 ### 向vector对象中添加元素 ###
 
+创建一个vector对象时并不清楚实际所需的元素个数，元素的值也经常无法确定。
+
+还有些时候即使元素的初值已知，但如果这些值重量大而各不相同，那么在创建vectod对象的时候执行初始化操作也会显得过于繁琐。
+
+利用vector的成员函数`push_back()`向其中添加元素
+
+	vector<int> v2; // empty vector
+	for (int i = 0; i != 100; ++i)
+		v2.push_back(i); // append sequential integers to v2
+		// at end of loop v2 has 100 elements, values 0 . . . 99
+
+有时需要读入数据然后将其赋予vector对象
+
+	// read words from the standard input and store them as elements in a vector
+	
+	string word;
+	vector<string> text; // empty vector
+	while (cin >> word) {
+		text.push_back(word); // append word to text
+	}
+
+**vector对象能高效增长**：C++标准要求vector应该能在运行时高效快速地添加元素。
+
+开始的时候创建空的vector对象，在运行时再动态添加元素，这做法与C语言及其他大多数语言中内置数组类型的用法不同。
+
+特别是如果用惯C或者Java，可以预计在创建vector对象时顺便指定其容量是最好的。然而事实上，通常的情况是恰恰相反。
+
+### 其他vector操作 ###
+
+大多数与string的相关操作类似
+
+![](image/05.png)
+
+	vector<int> v{1,2,3,4,5,6,7,8,9};
+
+	for (auto &i : v) // for each element in v (note: i is a reference)
+		//修改元素
+		i *= i; // square the element value
+	for (auto i : v) // for each element in v
+		cout << i << " "; // print the element
+	cout << endl;
+
+size()返回vector对象中元素的个数，返回值的类型是由vector定义的size_type类型。
+
+要使用size_type，需首先指定它是由哪种类型定义的。vector对象的类型总是包含着元素的类型
+
+	vector<int>::size_type//正确
+	vector::size_type//错误
+
+两个vector对象相等当且仅当它们所含的元素个数相同，而且对应位置的元素值也相等。
+
+只有当元素的值可比较时，vector对象才能被比较。
+
+#### 计算vector内对象的索引 ####
+
+vector对象的下标也是从0开始计起，下标的类型是相应的size_type类型。
+
+	// count the number of grades by clusters of ten: 0--9, 10--19, . .. 90--99, 100
+	vector<unsigned> scores(11, 0); // 11 buckets, all initially 0
+
+	unsigned grade;
+
+	while (cin >> grade) { // read the grades
+	if (grade <= 100) // handle only valid grades
+		++scores[grade/10]; // increment the counter for the current cluster
+	}
+
+#### 不能用下标形式添加元素 ####
+
+	vector<int> ivec; // empty vector
+	for (decltype(ivec.size()) ix = 0; ix != 10; ++ix)
+		ivec[ix] = ix; // disaster: ivec has no elements
+
+	for (decltype(ivec.size()) ix = 0; ix != 10; ++ix)
+		ivec.push_back(ix); // ok: adds a new element with value ix
+
+
+
 ## 迭代器介绍 ##
 
 ## 数组 ##

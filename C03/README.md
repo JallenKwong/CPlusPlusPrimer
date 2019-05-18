@@ -477,12 +477,73 @@ vector对象的下标也是从0开始计起，下标的类型是相应的size_ty
 	for (decltype(ivec.size()) ix = 0; ix != 10; ++ix)
 		ivec[ix] = ix; // disaster: ivec has no elements
 
+	//正确做法
 	for (decltype(ivec.size()) ix = 0; ix != 10; ++ix)
 		ivec.push_back(ix); // ok: adds a new element with value ix
 
+vector对象(以及string对象)的下标运算符可用于访问已存在的元素，而不能用于添加元素。
 
+**只能对确知已存在的元素执行下标操作**
+
+	vector<int> ivec; // empty vector
+	cout << ivec[0]; // error: ivec has no elements!
+
+	vector<int> ivec2(10); // vector with ten elements
+	cout << ivec2[10]; // error: ivec2 has elements 0 . . . 9
+
+通过访问不存在的元素的行为非常常见，而且会产生很严重的后果。
+
+所谓**缓冲区溢出buffer overflow**指的就是这类错误，这也是导致PC及其他设备上应用程序出现安全问题的一个重要原因。
+
+**确保下标合法的一种有效手段就是尽可能使用范围for语句。**
 
 ## 迭代器介绍 ##
+
+用来访问string或容器（如vector）内的元素。
+
+### 使用迭代器 ###
+
+begin成员负责返回指向第一个元素（或第一个字符的迭代器）。
+
+	// the compiler determines the type of b and e; 
+	// b denotes the first element and e denotes one past the last element in v
+	auto b = v.begin(), e = v.end(); // b and e have the same type
+
+end成员负责返回指向容器（或string对象）“**尾元素的下一位置one past the end**”的迭代器，也就是说，该迭代器指示的是容器的一个本不存在的“**尾后off the end**”。这迭代器没有实际含义，仅是个标记而已，表示我们已经处理完了容器中的所有元素。
+
+end成员返回的迭代器常被称为**尾后迭代器off-the-end iterator**或者简称为**尾迭代器end iterator**
+
+**如果容器为空，则begin和end返回的是同一个迭代器，都是尾后迭代器。**
+
+#### 迭代器运算符 ####
+
+![](image/06.png)
+
+	//例程——用迭代器将头字母变为大写
+	string s("some string");
+	if (s.begin() != s.end()) { // make sure s is not empty
+		auto it = s.begin(); // it denotes the first character in s
+		*it = toupper(*it); // make that character uppercase
+	}
+
+#### 将迭代器从一个元素移动到另外一个元素 ####
+
+迭代器使用递增++运算符从一个元素移动到下一个元素。
+
+**因为end返回的迭代器并不实际只是某个元素，所以不能对其进行递增或解引用的操作。**
+
+	// process characters in s until we run out of characters or we hit a whitespace
+	for (auto it = s.begin(); it != s.end() && !isspace(*it);
+	++it)
+		*it = toupper(*it); // capitalize the current character
+
+#### 关键概念：泛型编程 ####
+
+在for判断结束式，C++偏爱用 != 而不是 <(C,Java)
+
+C++程序员习惯性使用!=，其原因和他们更愿意使用迭代器而非下标的原因一样：**因为这种编程风格在标准库提供所有容器都有效**。<在标准库中可能没有定义。
+
+#### 迭代器类型 ####
 
 ## 数组 ##
 

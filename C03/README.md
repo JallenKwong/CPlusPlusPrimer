@@ -539,11 +539,92 @@ end成员返回的迭代器常被称为**尾后迭代器off-the-end iterator**�
 
 #### 关键概念：泛型编程 ####
 
-在for判断结束式，C++偏爱用 != 而不是 <(C,Java)
+在for判断循环结束式，C++偏爱用 != 而不是 <(C,Java)
 
 C++程序员习惯性使用!=，其原因和他们更愿意使用迭代器而非下标的原因一样：**因为这种编程风格在标准库提供所有容器都有效**。<在标准库中可能没有定义。
 
 #### 迭代器类型 ####
+
+const_iterator和常量指针差不多，**能读取** 但 **不能修改**它所指的元素值。
+
+相反，iterator的对象可读可写。
+
+	vector<int>::iterator it; // it can read and write vector<int> elements
+	string::iterator it2; // it2 can read and write characters in a string
+	vector<int>::const_iterator it3; // it3 can read but not write elements
+	string::const_iterator it4; // it4 can read but not write characters
+
+#### begin和end运算符 ####
+
+begin和end返回的具体类型由对象是否是常量决定，如果对象是常量，begin和end返回const_iterator；如果对象不是常量，返回iterator.
+
+	vector<int> v;
+	const vector<int> cv;
+
+	auto it1 = v.begin(); // it1 has type vector<int>::iterator
+	auto it2 = cv.begin(); // it2 has type vector<int>::const_iterator
+
+为了便于专门得到const_iterator类型返回值，C++新标准引入了两个新函数，分别cbegin和cend：
+
+	auto it3 = v.cbegin(); // it3 has type vector<int>::const_iterator
+
+不论vector对象（或string对象）本身是否是常量，返回值都是const_iterator。
+
+#### 结合解引用和成员访问操作 ####
+
+解引用迭代器可获得迭代器所指的对象，如果该对象的类型恰好是类，就有可能希望进一步访问它的成员。因此，需要检查其元素是否为空。
+
+	(*it).empty() // dereferences it and calls the member empty on the resulting
+	object
+	*it.empty() // error: attempts to fetch the member named empty from it
+	// but it is an iterator and has no member named empty
+
+为了简化上述表达式，C++定义了箭头运算符`->`。箭头运算符把解引用和成员访问两个操作结合在一起，也就是说，`it->mem`和`(*it).mem`表达的意思相同。
+
+	// print each line in text up to the first blank line
+	for (auto it = text.cbegin();
+	it != text.cend() && !it->empty(); ++it)
+		cout << *it << endl;
+
+#### 某些对vector对象的操作会使迭代器失效 ####
+
+**谨记**，但凡是使用了迭代器的循环体，都不要向迭代器所属的容器添加元素。
+
+### 迭代器运算 ###
+
+除了==，!=外，string和vector的迭代器提供了更多额外的运算符。
+
+![](image/07.png)
+
+#### 迭代器的算术运算 ####
+
+	// compute an iterator to the element closest to the midpoint of vi
+	auto mid = vi.begin() + vi.size() / 2;
+
+	if (it < mid)
+		// process elements in the first half of vi
+
+只要两个迭代器指向的是同一个容器中的元素或者尾元素的下一位置，将其相减，所得结果是两个迭代器的距离。
+
+这距离指的是右侧的迭代器向前移动多少位置就能追上左侧的迭代器，其类型是名为`difference_type`的带符号整型数。string和vector都定义了`difference_type`。
+
+
+#### 使用迭代器运算 ####
+
+下面程序使用迭代器完成了二分搜索
+
+	// text must be sorted
+	// beg and end will denote the range we're searching
+	auto beg = text.begin(), end = text.end();
+	auto mid = text.begin() + (end - beg)/2; // original midpoint //不用(beg + end) / 2是因为beg + end有溢出的风险
+	// while there are still elements to look at and we haven't yet found sought
+	while (mid != end && *mid != sought) {
+		if (sought < *mid) // is the element we want in the first half?
+			end = mid; // if so, adjust the range to ignore the second half
+		else // the element we want is in the second half
+			beg = mid + 1; // start looking with the element just after mid
+		mid = beg + (end - beg)/2; // new midpoint
+	}
 
 ## 数组 ##
 

@@ -616,7 +616,8 @@ begin和end返回的具体类型由对象是否是常量决定，如果对象是
 	// text must be sorted
 	// beg and end will denote the range we're searching
 	auto beg = text.begin(), end = text.end();
-	auto mid = text.begin() + (end - beg)/2; // original midpoint //不用(beg + end) / 2是因为beg + end有溢出的风险
+	//不用(beg + end) / 2是因为beg + end有溢出的风险
+	auto mid = text.begin() + (end - beg)/2; // original midpoint 
 	// while there are still elements to look at and we haven't yet found sought
 	while (mid != end && *mid != sought) {
 		if (sought < *mid) // is the element we want in the first half?
@@ -627,6 +628,98 @@ begin和end返回的具体类型由对象是否是常量决定，如果对象是
 	}
 
 ## 数组 ##
+
+因为数组大小固定，因此对某些特殊应用来说程序的运行时性能较好，但是相应地也损失了一些灵活性。
+
+**如果不清楚元素的确切个数，请使用vector**
+
+### 定义和初始化内置数组 ###
+
+数组是一种复合类型。
+
+	unsigned cnt = 42; // not a constant expression
+	constexpr unsigned sz = 42; // constant expression
+
+	int arr[10]; // array of ten ints
+	int *parr[sz]; // array of 42 pointers to int
+	string bad[cnt]; // error: cnt is not a constant expression
+	string strs[get_size()]; // ok if get_size is constexpr, error otherwise
+
+定义数组的时候必须指定数组的类型，**不允许用auto关键字**由初始值的列表推断类型。另外和vector一样，数组的元素应为对象，因此不存在引用的数组。
+
+#### 显示初始化数组元素 ####
+
+	const unsigned sz = 3;
+	int ia1[sz] = {0,1,2}; // array of three ints with values 0, 1, 2
+	int a2[] = {0, 1, 2}; // an array of dimension 3
+	int a3[5] = {0, 1, 2}; // equivalent to a3[] = {0, 1, 2, 0, 0}
+	string a4[3] = {"hi", "bye"}; // same as a4[] = {"hi", "bye", ""}
+	int a5[2] = {0,1,2}; // error: too many initializers
+
+
+#### 字符数组的特殊性 ####
+
+字符数组有一种额外的初始化形式，可用字符串字面量对此数组初始化。当使用这种方式时，一定要注意字符串字面值的结尾处还有一个空字符，这个空字符也会像字符串的其他字符一样被拷贝到字符数组中去：
+
+	char a1[] = {'C', '+', '+'}; // list initialization, no null
+	char a2[] = {'C', '+', '+', '\0'}; // list initialization, explicit null
+	char a3[] = "C++"; // null terminator added automatically
+	const char a4[6] = "Daniel"; // error: no space for the null!
+
+#### 不允许拷贝和赋值 ####
+
+不能将数组的内容拷贝给其他数组作为其初始值，也不能用数组为其他数组赋值：
+
+	int a[] = {0, 1, 2}; // array of three ints
+	int a2[] = a; // error: cannot initialize one array with another
+	a2 = a; // error: cannot assign one array to another
+
+**Warning**：
+Some compilers allow array assignment as a **compiler extension**. It is usually a good idea to avoid using nonstandard features. Programs that use such features, will not work with a different compiler.
+
+
+#### 理解复杂的数组声明 ####
+
+	int *ptrs[10]; // ptrs is an array of ten pointers to int
+	int &refs[10] = /* ? */; // error: no arrays of references//数组里的元素 不能是 引用
+	int (*Parray)[10] = &arr; // Parray points to an array of ten ints
+	int (&arrRef)[10] = arr; // arrRef refers to an array of ten ints
+
+	int *(&arry)[10] = ptrs; // arry is a reference to an array of ten pointers
+
+**要想理解数组声明的含义，最好的办法是从数组的名字开始按照由内向外的顺序阅读。**
+
+### 访问数组元素 ###
+
+数组的元素也能使用**范围for语句**或**下标运算符**来访问。数组的索引从0开始。
+
+在使用数组下标的时候，通常将其定义为site_t类型。site_t是一种机器相关的无符号类型，它被设计得足够大以便能表示内存中任意对象的大小。
+
+在cstddef头文件中定义了size_t类型，这文件时C标准库stddef.h的头文件的C++语言版本。
+
+	// count the number of grades by clusters of ten: 0--9, 10--19, ... 90--99, 100
+	unsigned scores[11] = {}; // 11 buckets, all value initialized to 0
+	unsigned grade;
+	while (cin >> grade) {
+		if (grade <= 100)
+			++scores[grade/10]; // increment the counter for the current cluster
+	}
+
+
+	for (auto i : scores) // for each counter in scores
+		cout << i << " "; // print the value of that counter
+	cout << endl;
+
+#### 检查下标的值 ####
+
+与vector和string一样，数组的下标是否在合理范围之内由**程序员负责检查**，所谓合理就是说下标应该大于等于0而且小于数组的大小。
+
+要想防止数组下标越界，除了小心谨慎注意细节以及对代码进行彻底的测试之外，没有其他好办法。对于一个程序来说，即使顺利通过编译并执行，也不能肯定它包含此类致命的错误。
+
+### 指针和数组 ###
+
+
+
 
 ## 多维数组 ##
 

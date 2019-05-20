@@ -718,6 +718,69 @@ Some compilers allow array assignment as a **compiler extension**. It is usually
 
 ### 指针和数组 ###
 
+在C++中，指针和数组有非常紧密的联系。使用**数组**的时候编译器一般会把它转换成**指针**。
+
+	string nums[] = {"one", "two", "three"}; // array of strings
+	string *p = &nums[0]; // p points to the first element in nums
+
+	string *p2 = nums; // equivalent to p2 = &nums[0]
+
+**在大多数表达式中，使用数组类型的对象其实是使用一个指向该数组首元素的指针。**
+
+由上可知，在一些情况下数组操作实际上是指针操作，这一结论有很多隐含的意思。
+
+其中一层意思是当使用数组作为一个auto变量的初始值时，推断得到的类型是指针而非数组：
+
+	int ia[] = {0,1,2,3,4,5,6,7,8,9}; // ia is an array of ten ints
+	auto ia2(ia); // ia2 is an int* that points to the first element in ia
+	ia2 = 42; // error: ia2 is a pointer, and we can't assign an int to a pointer
+
+	//ia是由10个整数构成的数组，但使用ia作为初始值时，编译器实际执行的初始过程类似如下面的形式
+	auto ia2(&ia[0]); // now it's clear that ia2 has type int*
+
+但当使用decltype关键字时上述转换不会发生
+
+	// ia3 is an array of ten ints
+	decltype(ia) ia3 = {0,1,2,3,4,5,6,7,8,9};
+	ia3 = p; // error: can't assign an int* to an array
+	ia3[4] = i; // ok: assigns the value of i to an element in ia3
+
+#### 指针也是迭代器 ####
+
+	int arr[] = {0,1,2,3,4,5,6,7,8,9};
+	int *p = arr; // p points to the first element in arr
+	++p; // p points to arr[1]
+
+	//可以设法获得数组尾元素之后的那个并不存在的元素地址
+	int *e = &arr[10]; // pointer just past the last element in arr
+
+	//输出arr的全部元素
+	for (int *b = arr; b != e; ++b)
+		cout << *b << endl; // print the elements in arr
+
+#### 标准库函数begin和end ####
+
+尽管计算得到尾后指针，但这做法极易出错。为了让指针的使用更简单、更安全。C++11新标准引入begin和end函数来得到数组的第一和尾后指针。
+
+	int ia[] = {0,1,2,3,4,5,6,7,8,9}; // ia is an array of ten ints
+	int *beg = begin(ia); // pointer to the first element in ia
+	int *last = end(ia); // pointer one past the last element in ia
+
+这两个函数定义在iterator头文件中。
+
+例程，假设arr是一个整型数组，找出第一个负数
+
+	// pbeg points to the first and pend points just past the last element in arr
+	int *pbeg = begin(arr), *pend = end(arr);
+	// find the first negative element, stopping if we've seen all the elements
+	while (pbeg != pend && *pbeg >= 0)
+		++pbeg;
+
+**特别要注意，尾后指针不能执行解引用和递增操作。**
+
+#### 指针运算 ####
+
+
 
 
 

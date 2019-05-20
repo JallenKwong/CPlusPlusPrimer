@@ -780,8 +780,64 @@ Some compilers allow array assignment as a **compiler extension**. It is usually
 
 #### 指针运算 ####
 
+给（从）一个指针加上（减去）某个整数值，结果仍是指针。新指针指向的元素与原来的指针相比前进了（后退了）该整数值个位置：
 
+	//前进或后移
+	constexpr size_t sz = 5;
+	int arr[sz] = {1,2,3,4,5};
+	int *ip = arr; // equivalent to int *ip = &arr[0]
+	int *ip2 = ip + 4; // ip2 points to arr[4], the last element in arr
 
+	// ok: arr is converted to a pointer to its first element; p points one past the end of
+	arr
+	int *p = arr + sz; // use caution -- do not dereference!//尾后
+	int *p2 = arr + 10; // error: arr has only 5 elements; p2 has undefined value越界
+
+两指针之间的距离，两指针必须指向同一个数组当中元素：
+
+	auto n = end(arr) - begin(arr); // n is 5, the number of elements in arr
+
+两指针相减的结果类型是一种名为ptrdiff_t的标准类型，定义在cstddef头文件中的机器相关的类型，该值可正可负，该类型是一种带符号类型。
+
+比较两指针，两指针必须指向同一个数组当中元素
+
+	int *b = arr, *e = arr + sz;
+	while (b < e) {
+		// use *b
+		++b;
+	}
+
+错误的比较例程
+
+	int i = 0, sz = 42;
+	int *p = &i, *e = &sz;
+	// undefined: p and e are unrelated; comparison is meaningless!
+		while (p < e)
+
+#### 解引用和指针运算的交互 ####
+
+	int ia[] = {0,2,4,6,8}; // array with 5 elements of type int
+	int last = *(ia + 4); // ok: initializes last to 8, the value of ia[4]
+
+	last = *ia + 4; // ok: last = 4, equivalent to ia[0] + 4
+
+#### 下标和指针 ####
+
+	int ia[] = {0,2,4,6,8}; // array with 5 elements of type int
+
+	int i = ia[2]; // ia is converted to a pointer to the first element in ia
+	// ia[2] fetches the element to which (ia + 2) points
+	int *p = ia; // p points to the first element in ia
+	i = *(p + 2); // equivalent to i = ia[2]
+
+	int *p = &ia[2]; // p points to the element indexed by 2
+	int j = p[1]; // p[1] is equivalent to *(p + 1),
+	// p[1] is the same element as ia[3]
+	int k = p[-2]; // p[-2] is the same element as ia[0]//下标可负数
+
+**内置的下标运算符所用的索引值不是无符号类型，这一点与vector和string不一样。**
+
+### C风格字符串 ###
 
 
 ## 多维数组 ##

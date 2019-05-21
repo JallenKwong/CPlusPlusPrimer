@@ -1,5 +1,149 @@
 # 字符串、向量和数组 #
 
+[1.命名空间的using声明](#命名空间的using声明)
+
+[1.1.每个名字都需要独立的using声明](#每个名字都需要独立的using声明)
+
+[1.2.头文件不应该包含using声明](#头文件不应该包含using声明)
+
+[2.标准库类型string](#标准库类型string)
+
+[2.1.定义和初始化string对象](#定义和初始化string对象)
+
+[2.2.直接初始化和拷贝初始化](#直接初始化和拷贝初始化)
+
+[2.3.string对象上的操作](#string对象上的操作)
+
+[2.4.读写string对象](#读写string对象)
+
+[2.5.读取未知数量的string对象](#读取未知数量的string对象)
+
+[2.6.使用getline读取一整行](#使用getline读取一整行)
+
+[2.7.string的empty和size操作](#string的empty和size操作)
+
+[2.8.string::size_type类型](#stringsize_type类型)
+
+[2.9.比较string对象](#比较string对象)
+
+[2.10.为string对象赋值](#为string对象赋值)
+
+[2.11.两个string对象相加](#两个string对象相加)
+
+[2.12.字面值和string对象相加](#字面值和string对象相加)
+
+[2.13.处理string对象中的字符](#处理string对象中的字符)
+
+[2.13.1.处理每个字符？使用基于范围的for语句](#处理每个字符使用基于范围的for语句)
+
+[2.13.2.使用范围for语句改变字符串中的字符](#使用范围for语句改变字符串中的字符)
+
+[2.13.3.只处理一部分字符？](#只处理一部分字符)
+
+[2.13.4.使用下标执行迭代](#使用下标执行迭代)
+
+[2.13.5.使用下标执行随机访问](#使用下标执行随机访问)
+
+[3.标准库类型vector](#标准库类型vector)
+
+[3.1.定义和初始化vector对象](#定义和初始化vector对象)
+
+[3.1.1.列表初始化vector对象](#列表初始化vector对象)
+
+[3.1.2.创建指定数量的元素](#创建指定数量的元素)
+
+[3.1.3.值初始化](#值初始化)
+
+[3.1.4.列表初始值还是元素数量？](#列表初始值还是元素数量)
+
+[3.2.向vector对象中添加元素](#向vector对象中添加元素)
+
+[3.3.其他vector操作](#其他vector操作)
+
+[3.3.1.计算vector内对象的索引](#计算vector内对象的索引)
+
+[3.3.2.不能用下标形式添加元素](#不能用下标形式添加元素)
+
+[4.迭代器介绍](#迭代器介绍)
+
+[4.1.使用迭代器](#使用迭代器)
+
+[4.1.1.迭代器运算符](#迭代器运算符)
+
+[4.1.2.将迭代器从一个元素移动到另外一个元素](#将迭代器从一个元素移动到另外一个元素)
+
+[4.1.3.关键概念：泛型编程](#关键概念泛型编程)
+
+[4.1.4.迭代器类型](#迭代器类型)
+
+[4.1.5.begin和end运算符](#begin和end运算符)
+
+[4.1.6.结合解引用和成员访问操作](#结合解引用和成员访问操作)
+
+[4.1.7.某些对vector对象的操作会使迭代器失效](#某些对vector对象的操作会使迭代器失效)
+
+[4.2.迭代器运算](#迭代器运算)
+
+[4.2.1.迭代器的算术运算](#迭代器的算术运算)
+
+[4.2.2.使用迭代器运算](#使用迭代器运算)
+
+[5.数组](#数组)
+
+[5.1.定义和初始化内置数组](#定义和初始化内置数组)
+
+[5.1.1.显示初始化数组元素](#显示初始化数组元素)
+
+[5.1.2.字符数组的特殊性](#字符数组的特殊性)
+
+[5.1.3.不允许拷贝和赋值](#不允许拷贝和赋值)
+
+[5.1.4.理解复杂的数组声明](#理解复杂的数组声明)
+
+[5.2.访问数组元素](#访问数组元素)
+
+[5.2.1.检查下标的值](#检查下标的值)
+
+[5.3.指针和数组](#指针和数组)
+
+[5.3.1.指针也是迭代器](#指针也是迭代器)
+
+[5.3.2.标准库函数begin和end](#标准库函数begin和end)
+
+[5.3.3.指针运算](#指针运算)
+
+[5.3.4.解引用和指针运算的交互](#解引用和指针运算的交互)
+
+[5.3.5.下标和指针](#下标和指针)
+
+[5.4.C风格字符串](#c风格字符串)
+
+[5.4.1.C标准String函数](#c标准string函数)
+
+[5.4.2.比较字符串](#比较字符串)
+
+[5.4.3.目标字符串的大小由调用者指定](#目标字符串的大小由调用者指定)
+
+[5.5.与旧代码的接口](#与旧代码的接口)
+
+[5.5.1.混用string对象和C风格字符串](#混用string对象和c风格字符串)
+
+[5.5.2.使用数组初始化vector对象](#使用数组初始化vector对象)
+
+[6.多维数组](#多维数组)
+
+[6.1.多维数组的初始化](#多维数组的初始化)
+
+[6.2.多维数组的下标引用](#多维数组的下标引用)
+
+[6.3.使用范围for语句处理多维数组](#使用范围for语句处理多维数组)
+
+[6.4.指针和多维数组](#指针和多维数组)
+
+[6.5.类型别名简化多维数组的指针](#类型别名简化多维数组的指针)
+
+[7.小结](#小结)
+
 ## 命名空间的using声明 ##
 
 using declaration
@@ -895,10 +1039,143 @@ ca1和ca2字符数组执行上述操作+会产生错误。
 
 ### 与旧代码的接口 ###
 
+#### 混用string对象和C风格字符串 ####
 
+	string s("Hello World")
 
+	char *str = s; // error: can't initialize a char* from a string
+	const char *str = s.c_str(); // ok
 
+#### 使用数组初始化vector对象 ####
+
+	int int_arr[] = {0, 1, 2, 3, 4, 5};
+	// ivec has six elements; each is a copy of the corresponding element in int_arr
+	vector<int> ivec(begin(int_arr), end(int_arr));
+
+	// copies three elements: int_arr[1], int_arr[2], int_arr[3]
+	vector<int> subVec(int_arr + 1, int_arr + 4);
+
+现代的C++程序**应当**尽量使用vector和迭代器，**避免**使用内置数组和指针；**应该**尽量使用string，**避免**使用C风格的基于数组的字符串
 
 ## 多维数组 ##
 
+C++中，多维数组其实 是 数组的数组
 
+	int ia[3][4]; // array of size 3; each element is an array of ints of size 4
+		// array of size 10; each element is a 20-element array whose elements are arrays of 30 ints
+	int arr[10][20][30] = {0}; // initialize all elements to 0
+
+### 多维数组的初始化 ###
+
+	int ia[3][4] = { // three elements; each element is an array of size 4
+					{0, 1, 2, 3}, // initializers for the row indexed by 0
+					{4, 5, 6, 7}, // initializers for the row indexed by 1
+					{8, 9, 10, 11} // initializers for the row indexed by 2
+				};
+
+	// equivalent initialization without the optional nested braces for each row
+	int ia[3][4] = {0,1,2,3,4,5,6,7,8,9,10,11};
+
+	// explicitly initialize only element 0 in each row
+	int ia[3][4] = {{ 0 }, { 4 }, { 8 }};
+
+	// explicitly initialize row 0; the remaining elements are value initialized
+	int ix[3][4] = {0, 3, 6, 9};
+
+### 多维数组的下标引用 ###
+
+	// assigns the first element of arr to the last element in the last row of ia
+	ia[2][3] = arr[0][0][0];
+	int (&row)[4] = ia[1]; // binds row to the second four-element array in ia
+
+	constexpr size_t rowCnt = 3, colCnt = 4;
+	int ia[rowCnt][colCnt]; // 12 uninitialized elements
+	// for each row
+	for (size_t i = 0; i != rowCnt; ++i) {
+	// for each column within the row
+		for (size_t j = 0; j != colCnt; ++j) {
+			// assign the element's positional index as its value
+			ia[i][j] = i * colCnt + j;
+		}
+	}
+
+### 使用范围for语句处理多维数组 ###
+
+
+	size_t cnt = 0;
+	for (auto &row : ia) // for every element in the outer array
+		for (auto &col : row) { // for every element in the inner array
+			col = cnt; // give this element the next value
+			++cnt; // increment cnt
+		}
+
+因为要改变数组元素，所以我们选用引用类型作为循环控制变量。另外还有一个深层原因促使我们做。
+
+	//
+	for (const auto &row : ia) // for every element in the outer array
+		for (auto col : row) // for every element in the inner array
+	cout << col << endl;
+
+上面程序没有任何写操作，但还是在外层循环的控制变量声明成了引用类型，这是**为了避免数组被自动转成指针**。
+
+假设不使用引用类型
+
+	//
+	for (auto row : ia)
+		for (auto col : row)
+
+上面程序无法通过编译。因为row不是引用类型，所以编译器初始化row时会自动将这些数组形式的元素（和其他类型的数组一样）转换成指向该数组内首元素的指针。这样得到的row的类型就是`int *`，显然内层的循环就不合法了，编译器将试图在一个`int *`内遍历，这显然和程序的初衷相去甚远。
+
+要使用范围for语句处理多维数组，除了最内层的循环外，**其他所有循环的控制变量都应该是引用类型**。
+
+### 指针和多维数组 ###
+
+**定义指向多维数组的指针时，千万别忘了这个多维数组实际上是数组的数组。**
+
+	int ia[3][4]; // array of size 3; each element is an array of ints of size 4
+	int (*p)[4] = ia; // p points to an array of four ints//ia的第一行 int (*p)[4] = &ia[0]
+	p = &ia[2]; // p now points to the last element in ia
+
+**上述声明中，圆括号必不可少**：
+
+	int *ip[4]; // array of pointers to int
+	int (*ip)[4]; // pointer to an array of four ints
+
+随着C++11新标准，通过使用auto或者decltype就能尽可能地避免在数组前面加上一个指针类型了：
+
+	// print the value of each element in ia, with each inner array on its own line
+	// p points to an array of four ints
+	for (auto p = ia; p != ia + 3; ++p) {
+	// q points to the first element of an array of four ints; that is, q points to an int
+		for (auto q = *p; q != *p + 4; ++q)
+			cout << *q << ' ';
+		cout << endl;
+	}
+
+使用标准库函数begin和end也能实现上面功能
+
+	// p points to the first array in ia
+	for (auto p = begin(ia); p != end(ia); ++p) {
+	// q points to the first element in an inner array
+		for (auto q = begin(*p); q != end(*p); ++q)
+			cout << *q << ' '; // prints the int value to which q points
+		cout << endl;
+	}
+
+
+### 类型别名简化多维数组的指针 ###
+
+	using int_array = int[4]; // new style type alias declaration; 
+	typedef int int_array[4]; // equivalent typedef declaration; 
+	// print the value of each element in ia, with each inner array on its own line
+
+	for (int_array *p = ia; p != ia + 3; ++p) {
+		for (int *q = *p; q != *p + 4; ++q)
+			cout << *q << ' ';
+		cout << endl;
+	}
+
+
+## 小结 ##
+
+一般来说，应该优先选用标准库提供的类型，之后再考虑C++语言内置的低层的替代品数组或指针。

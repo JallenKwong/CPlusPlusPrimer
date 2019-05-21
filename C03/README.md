@@ -839,6 +839,65 @@ Some compilers allow array assignment as a **compiler extension**. It is usually
 
 ### C风格字符串 ###
 
+**尽管C++支持C风格字符串，但在C++程序中最好还是不要使用它们。这是因为C风格字符串不仅使用起来不太方便，而且极易引发程序漏洞，是诸多安全问题的根本原因。**
+
+字符串字面值是一种通用结构实例，这种即是C++由C继承而来的**C风格字符串C-style character string**。它不是一种类型，而且为了表达和使用字符串而形成的一种约定俗成的写法。
+
+按此习惯书写的字符串存放在字符数组中并以**空字符结束null terminated**。以空字符结束的意思是在字符串最后一个字符后面跟着一个空字符（'\0'）。
+
+一般利用指针来操作这些字符串。
+
+#### C标准String函数 ####
+
+定义在cstring头文件中，它是C语言头文件string.h的C++版本。
+
+![](image/08.png)
+
+**上面函数不负责验证其字符串参数。**
+
+传入此类函数的指针必须指向以空字符作为结束的数组。
+
+	char ca[] = {'C', '+', '+'}; // not null terminated
+	cout << strlen(ca) << endl; // disaster: ca isn't null terminated
+
+#### 比较字符串 ####
+
+比较两个C风格字符串的方法和之前学习过的比较标准库string对象的方法大相径庭。
+
+	string s1 = "A string example";
+	string s2 = "A different string";
+	if (s1 < s2) // false: s2 is less than s1
+
+	const char ca1[] = "A string example";
+	const char ca2[] = "A different string";
+	if (ca1 < ca2) // undefined: compares two unrelated addresses
+
+	//正确比较方法，调用strcmp函数
+	if (strcmp(ca1, ca2) < 0) // same effect as string comparison s1 < s2
+
+#### 目标字符串的大小由调用者指定 ####
+
+连接或拷贝C风格字符串也与标准库string对象的同类操作差别很大。
+
+	// initialize largeStr as a concatenation of s1, a space, and s2
+	string largeStr = s1 + " " + s2;
+
+ca1和ca2字符数组执行上述操作+会产生错误。
+
+正确做法使用strcpy函数和strcat函数，并且提供一个用于存放结果字符串和足够大的字符数组。
+
+	// disastrous灾难性的 if we miscalculated the size of largeStr
+	strcpy(largeStr, ca1); // copies ca1 into largeStr
+	strcat(largeStr, " "); // adds a space at the end of largeStr
+	strcat(largeStr, ca2); // concatenates ca2 onto largeStr
+
+**对大多数应用来说，使用标准库string要比使用C风格字符串更安全、更高效**
+
+### 与旧代码的接口 ###
+
+
+
+
 
 ## 多维数组 ##
 

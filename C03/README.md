@@ -164,6 +164,10 @@ using declaration
 		return 0;
 	}
 
+[word_echo.cc](word_echo.cc)
+
+[输入数据](data/word_echo)
+
 ### 每个名字都需要独立的using声明 ###
 
 每个声明引入命名空间中的一个成员
@@ -182,6 +186,10 @@ using declaration
 		<< " is " << v1 + v2 << endl;
 		return 0;
 	}
+
+[add_using.cc](add_using.cc)
+
+[输入数据](data/add)
 
 一开始就有对`cin`、`cout`和`endl`的using声明，这意味着我们不再添加`std::`形式的前缀就能直接使用它们。
 
@@ -239,6 +247,10 @@ using declaration
 		return 0;
 	}
 
+[string_io.cc](string_io.cc)
+
+[输入数据](data/string_io)
+
 在执行读取操作时，string对象会自动忽略开头的空白（即空格符、换行符、制表符）并从第一个真正的字符开始读起，直到遇见下一处空白为止。
 
 So, if the input to this program is `Hello World!` (note leading and trailing spaces), then the output will be `Hello` with no extra spaces.
@@ -248,6 +260,10 @@ Like the input and output operations on the built-in types, the string operators
 	string s1, s2;
 	cin >> s1 >> s2; // read first input into s1, second into s2
 	cout << s1 << s2 << endl; // write both strings
+
+[string_io2.cc](string_io2.cc)
+
+[输入数据](data/string_io)
 
 If we give this version of the program the same input, `Hello World!`, our output would be “`HelloWorld!`”
 
@@ -278,6 +294,10 @@ getline()的参数是一个输入流和一个string对象，函数从给定的�
 		return 0;
 	}
 
+[getline.cc](getline.cc)
+
+[输入数据](data/word_echo)
+
 ### string的empty和size操作 ###
 
 empty()根据string对象是否为空返回一个对应的布尔值。
@@ -287,6 +307,8 @@ empty()根据string对象是否为空返回一个对应的布尔值。
 	if (!line.empty())
 		cout << line << endl;
 
+[string_size3.cc](string_size3.cc)
+
 size()返回string对象的长度。
 
 	string line;
@@ -294,6 +316,8 @@ size()返回string对象的长度。
 	while (getline(cin, line))
 		if (line.size() > 80)
 			cout << line << endl;
+
+[string_size2.cc](string_size2.cc)
 
 ### string::size_type类型 ###
 
@@ -306,6 +330,8 @@ C++新标准中，允许编译器auto或者decltype来推断变量的类型
 	auto len = line.size(); // len has type string::size_type
 
 切记，若表达式中混用了带符号数和无符号数将可能产生意想不到结果。例如，假如n是一个具有负值的`int`，则表达式`s.size()<n`的判断结果几乎肯定是`true`。因为负值n自动地转换成一个比较大无符号值。
+
+[string_size.cc](string_size.cc)
 
 ### 比较string对象 ###
 
@@ -326,6 +352,8 @@ These operators use the same strategy as a (case-sensitive) **dictionary**:
 	string slang = "Hiya";
 
 Using rule 1, we see that `str` is less than `phrase`. By applying rule 2, we see that `slang` is greater than both `str` and `phrase`.
+
+[strcompare.cc](strcompare.cc)
 
 ### 为string对象赋值 ###
 
@@ -364,11 +392,17 @@ Using rule 1, we see that `str` is less than `phrase`. By applying rule 2, we se
 
 	string s7 = ("hello" + ", ") + s2; // error: can't add string literals
 
+[string_add.cc](string_add.cc)
+
 ### 处理string对象中的字符 ###
 
 ![](image/03.png)
 
 **建议**：使用C++版本的C标准库头文件
+
+[cctype.cc](cctype.cc)
+
+	g++ -g -Wall -std=c++11 cctype.cc
 
 #### 处理每个字符？使用基于范围的for语句 ####
 
@@ -469,6 +503,10 @@ string对象的下标必须大于等于0而小于s.size()，超出范围引发�
 
 	Your hex number is: C05F8F
 
+[hexify.cc](hexify.cc)
+
+[输入数据](data/hexify)
+
 ## 标准库类型vector ##
 
 vector表示对象的集合，其中所有对象的类型都相同。集合中的每个对象都有一个与之对应的索引，索引用于访问对象。
@@ -512,6 +550,8 @@ vector 能容纳绝大多数类型的对象称为**其元素**，但是因为引
 
 #### 列表初始化vector对象 ####
 
+[vec_decls.cc](vec_decls.cc)
+
 C++11新标准
 
 	vector<string> articles = {"a", "an", "the"};
@@ -547,6 +587,8 @@ C++11新标准
 	vector<string> v8{10, "hi"}; // v8 has ten elements with value "hi"
 
 ### 向vector对象中添加元素 ###
+
+[vecScores.cc](vecScores.cc)
 
 创建一个vector对象时并不清楚实际所需的元素个数，元素的值也经常无法确定。
 
@@ -590,6 +632,8 @@ C++11新标准
 		cout << i << " "; // print the element
 	cout << endl;
 
+[square.cc](square.cc)
+
 size()返回vector对象中元素的个数，返回值的类型是由vector定义的size_type类型。
 
 要使用size_type，需首先指定它是由哪种类型定义的。vector对象的类型总是包含着元素的类型
@@ -602,6 +646,8 @@ size()返回vector对象中元素的个数，返回值的类型是由vector定�
 只有当元素的值可比较时，vector对象才能被比较。
 
 #### 计算vector内对象的索引 ####
+
+[vecSubs.cc](vecSubs.cc)
 
 vector对象的下标也是从0开始计起，下标的类型是相应的size_type类型。
 
@@ -730,6 +776,10 @@ begin和end返回的具体类型由对象是否是常量决定，如果对象是
 	it != text.cend() && !it->empty(); ++it)
 		cout << *it << endl;
 
+[vecStrings2.cc](vecStrings2.cc)
+
+[输入数据](vecStrings2)
+
 #### 某些对vector对象的操作会使迭代器失效 ####
 
 **谨记**，但凡是使用了迭代器的循环体，都不要向迭代器所属的容器添加元素。
@@ -854,6 +904,13 @@ Some compilers allow array assignment as a **compiler extension**. It is usually
 		cout << i << " "; // print the value of that counter
 	cout << endl;
 
+[arrayScores.cc](arrayScores.cc)
+
+[输入数据](data/grades)
+
+	//命令行编译
+	g++ -g -Wall -std=c++11 arrayScores.cc
+
 #### 检查下标的值 ####
 
 与vector和string一样，数组的下标是否在合理范围之内由**程序员负责检查**，所谓合理就是说下标应该大于等于0而且小于数组的大小。
@@ -919,6 +976,10 @@ Some compilers allow array assignment as a **compiler extension**. It is usually
 	// find the first negative element, stopping if we've seen all the elements
 	while (pbeg != pend && *pbeg >= 0)
 		++pbeg;
+
+[ptr_traversal2.cc](ptr_traversal2.cc)
+
+	g++ -g -Wall -std=c++11 ptr_traversal2.cc
 
 **特别要注意，尾后指针不能执行解引用和递增操作。**
 
@@ -997,6 +1058,8 @@ Some compilers allow array assignment as a **compiler extension**. It is usually
 
 ![](image/08.png)
 
+[cstring_hdr.cc](cstring_hdr.cc)
+
 **上面函数不负责验证其字符串参数。**
 
 传入此类函数的指针必须指向以空字符作为结束的数组。
@@ -1058,6 +1121,8 @@ ca1和ca2字符数组执行上述操作+会产生错误。
 现代的C++程序**应当**尽量使用vector和迭代器，**避免**使用内置数组和指针；**应该**尽量使用string，**避免**使用C风格的基于数组的字符串
 
 ## 多维数组 ##
+
+[multidim.cc](multidim.cc)
 
 C++中，多维数组其实 是 数组的数组
 
@@ -1179,3 +1244,10 @@ C++中，多维数组其实 是 数组的数组
 ## 小结 ##
 
 一般来说，应该优先选用标准库提供的类型，之后再考虑C++语言内置的低层的替代品数组或指针。
+
+将C:\Program Files (x86)\CodeBlocks\MinGW\bin 设置为环境变量Path，因为该目录下有g++编译器。
+
+[char_repl.cc](char_repl.cc)
+
+	 g++ -g -Wall -std=c++11 char_repl.cc
+

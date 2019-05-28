@@ -202,9 +202,135 @@ C++11新标准允许使用花括号起来的初始值列表作为赋值语句右
 	vector<int> vi; // initially empty
 	vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 
+### 赋值运算满足右结合律 ###
+
+	int ival, jval;
+	ival = jval = 0; // ok: each assigned 0
+
+对于多重赋值语句中的每一个对象，它的类型或者与由边对象的类型相同、或者可由对象的类型转换得到。
+
+	int ival, *pval; // ival is an int; pval is a pointer to int
+	ival = pval = 0; // error: cannot assign the value of a pointer to an int
+	string s1, s2;
+	s1 = s2 = "OK"; // string literal "OK" converted to string
+
+### 赋值运算优先级较低 ###
+
+	// a verbose and therefore more error-prone way to write this loop
+	int i = get_value(); // get the first value
+	while (i != 42) {
+		// do something ...
+		i = get_value(); // get remaining values
+	}
+
+精简成下面那样
+
+	int i;
+	// a better way to write our loop---what the condition does is now clearer
+	while ((i = get_value()) != 42) {
+		// do something ...
+	}
+
+因为赋值运算符的优先级低于关系运算符的优先级，所以在条件语句中，赋值部分通常应该加上括号。
+
+### 切勿混淆相等运算符和赋值运算符 ###
+
+	if (i = j)//
+
+	if (i == j)
+
+### 复合赋值运算符 ###
+
+	+= -= *= /= %= // arithmetic operators
+	<<= >>= &= ^= |= // bitwise operators;
+
+任意一种复合运算符都等价于
+
+	a = a op b;
+
+用例
+
+	int sum = 0;
+	// sum values from 1 through 10 inclusive
+	for (int val = 1; val <= 10; ++val)
+		sum += val; // equivalent to sum = sum + val
+
+
 ## 递增和递减运算符 ##
 
+
+有两种版本：前置和后置
+
+	int i = 0, j;
+	j = ++i; // j = 1, i = 1: prefix yields the incremented value
+	j = i++; // j = 1, i = 2: postfix yields the unincremented value
+
+**建议**：除非必须，否则不用递增递减运算符的后置版本。
+
+前置版本的递增运算符避免了不必要的工作，它把值加1后直接返回改变了的运算对象。与之相比，后置版本需要将原始值存储下来以便于返回这个未修改的内容。如果不需要修改前的值，那么后置版本的操作就是一种浪费。
+
+### 在一条语句中混用解引用和递增运算符 ###
+
+	auto pbeg = v.begin();
+	// print elements up to the first negative value
+	while (pbeg != v.end() && *beg >= 0)
+		cout << *pbeg++ << endl; // print the current value and advance pbeg
+
+`*pbeg++`
+
+**后递增运算符**的优先级高于**解引用运算符**，因此`*pbeg++`等价于`*(pbeg++)`。
+
+`pbeg++`把pbeg的值加1，然后返回pbeg的初始值的副本作为其求值结果，此时解引用运算符的运算对象是pbeg未增加之前的值。
+
+最终，1.这条语句输出pbeg开始时指向的那个元素，并2.将指针指向前移动一个位置。
+
+
+**建议**：简洁可以成为一种美德
+
+	cout << *iter++ << endl;
+	
+	cout << *iter << endl;
+	++iter;
+
+### 运算对象可按任意顺序求值 ###
+
+大多数运算符都没有规定运算对象的求值顺序
+
+	for (auto it = s.begin(); it != s.end() && !isspace(*it);
+	++it)
+		*it = toupper(*it); // capitalize the current character
+
+---
+
+	// the behavior of the following loop is undefined!
+	while (beg != s.end() && !isspace(*beg))
+		*beg = toupper(*beg++); // error: this assignment is undefined
+
+`*beg = toupper(*beg++)`该赋值语句是未定义的。编译器可能按照下面的任意一种思路处理该表达式：
+
+	*beg = toupper(*beg); // execution if left-hand side is evaluated first
+	*(beg + 1) = toupper(*beg); // execution if right-hand side is evaluated first
+
 ## 成员访问运算符 ##
+
+点运算符和箭头运算符都可用于访问成员
+
+	ptr->mem 等价于(*ptr).mem
+
+---
+
+	string s1 = "a string", *p = &s1;
+	auto n = s1.size(); // run the size member of the string s1
+	n = (*p).size(); // run size on the object to which p points
+	n = p->size(); // equivalent to (*p).size()
+
+解引用运算符的优先级低于点运算符，所以执行解引用运算的子表达式两端**必须**加上括号。
+
+	// run the size member of p, then dereference the result!
+	*p.size(); // error: p is a pointer and has no member named size
+
+## 条件运算符 ##
+
 
 ## 位运算符 ##
 

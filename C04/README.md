@@ -331,8 +331,62 @@ C++11新标准允许使用花括号起来的初始值列表作为赋值语句右
 
 ## 条件运算符 ##
 
+	cond ? expr1 : expr2;
+
+---
+
+	string finalgrade = (grade < 60) ? "fail" : "pass";
+
+### 嵌套条件运算符 ###
+
+	finalgrade = (grade > 90) ? "high pass"
+							: (grade < 60) ? "fail" : "pass";
+
+随着条件运算嵌套层数的增加，代码的可读性急剧下降。因此，条件运算的嵌套最好别超过两到三层。
+
+### 在输出表达式中使用条件运算符 ###
+
+条件运算符的优先级非常低，因此当一条长表达式中嵌套了条件运算子表达式，通常需要在它两端加上括号。否则，会有意外之果
+
+	cout << ((grade < 60) ? "fail" : "pass"); // prints pass or fail
+	cout << (grade < 60) ? "fail" : "pass"; // prints 1 or 0!
+	cout << grade < 60 ? "fail" : "pass"; // error: compares cout to 60
+
+第二条表达式等价于
+
+	cout << (grade < 60); // prints 1 or 0
+	cout ? "fail" : "pass"; // test cout and then yield one of the two literals
+							// depending on whether cout is true or false
+
+第三条表达式等价于
+
+	cout << grade; // less-than has lower precedence than shift, so print grade first
+	cout < 60 ? "fail" : "pass"; // then compare cout to 60!
 
 ## 位运算符 ##
+
+![](image/03.png)
+
+### 移位运算符 ###
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## sizeof运算符 ##
 
